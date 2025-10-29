@@ -16,6 +16,8 @@ class Arthur(Actor):
         self._djump = 4
         self._speed = 2
         self._health = 2
+        self._frame = 0
+        self._duration_frame = 10
         
         #animation stats
         self._sprite_start, self._sprite_end = IDLE_RIGHT
@@ -56,7 +58,7 @@ class Arthur(Actor):
         
 
     def hit(self, arena: Arena):
-        
+
         arena.kill(self)
 
     def pos(self) -> Point:
