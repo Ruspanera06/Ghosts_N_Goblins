@@ -3,40 +3,18 @@ class Zombie(Actor):
     def __init__(self, pos):
         self._x, self._y = pos
         self._w, self._h = 20, 20
-        self._dx, self._dy = 0, 0
-        self._jump = False
-        self.max_jump = 40
+        self._dx = 0
+        self._spawn = False 
         self._djump = 4
         self._speed = 2
 
     def move(self, arena: Arena):
-        G = 5
-        # for other in arena.collisions():
-        #     if isinstance(other, Arthur):
-        #         self.hit(arena)
-
-        keys = arena.current_keys()
-        if "ArrowUp" in keys and self._y + self._h == arena.size()[1]:
-            self._jump = True
-            self._dy -= self._djump
-        elif self._y + self._h == arena.size()[1]:
-            self._dy = 0
-            self._jump = False
-        if "ArrowLeft" in keys:
-            self._x -= self._speed
-        elif "ArrowRight" in keys:
-            self._x += self._speed
-        
-        #self._x += self._dx
-        if self._y > arena.size()[1]-self.max_jump and self._jump == True:
-            self._y += self._dy
-        else:
-            self._jump = False
-        if self._y + self._h < arena.size()[1] and self._jump == False:
-            self._y += G
-        
-
         aw, ah = arena.size()
+        self._x += self._dx 
+        
+        if self._x <=0 or self.x+self._w >= aw:
+            self._dx = -self._dx
+            
         self._x = min(max(self._x, 0), aw - self._w)  # clamp
         self._y = min(max(self._y, 0), ah - self._h)  # clamp
 
