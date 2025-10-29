@@ -13,9 +13,10 @@ sprite_x = 511
 RUNNING_LEFT_ARMOR = []
 #mirroring RUNNING_RIGHT_ARMOR so it become RUNNING_LEF_ARMOR
 for s in RUNNING_RIGHT_ARMOR:
-    x = sprite_x - s[0][0] - s[1][0]
+    s_x = (s[1][0]-s[0][0])
+    x = sprite_x - s[0][0] - s_x
     y = s[0][1]
-    size_x = x + s[1][0]
+    size_x = x + s_x
     size_y = s[1][1]
     RUNNING_LEFT_ARMOR.append(
         ((x, y), (size_x, size_y))
@@ -31,9 +32,10 @@ RUNNING_RIGHT_NAKED = [
 RUNNING_LEFT_NAKED = []
 #mirroring RUNNING_RIGHT_ARMOR so it become RUNNING_LEF_ARMOR
 for s in RUNNING_RIGHT_NAKED:
-    x = sprite_x - s[0][0] - s[1][0]
+    s_x = (s[1][0]-s[0][0])
+    x = sprite_x - s[0][0] - s_x
     y = s[0][1]
-    size_x = x + s[1][0]
+    size_x = x + s_x
     size_y = s[1][1]
     RUNNING_LEFT_NAKED.append(
         ((x, y), (size_x, size_y))
@@ -56,7 +58,7 @@ class Arthur(Actor):
         #animation stats
         self._sprite_start, self._sprite_end = IDLE_RIGHT_ARMOR
         self._frame = 0
-        self._duration_frame = 10
+        self._duration_frame = 3
         self._direction = 0 #0 = destra, 1 = sinistra
         
 
@@ -106,7 +108,14 @@ class Arthur(Actor):
                 self._sprite_start, self._sprite_end = IDLE_LEFT_ARMOR
             else:
                 self._sprite_start, self._sprite_end = IDLE_RIGHT_ARMOR
-        # elif self._dx > 0:
+        else:
+            if self._direction == 1:
+                index = (self._frame//self._duration_frame)%(len(RUNNING_LEFT_ARMOR))
+                self._sprite_start, self._sprite_end = RUNNING_LEFT_ARMOR[index]
+            else:
+                index = (self._frame//self._duration_frame)%(len(RUNNING_RIGHT_ARMOR))
+                self._sprite_start, self._sprite_end = RUNNING_RIGHT_ARMOR[index]
+
 
 
         
