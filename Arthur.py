@@ -3,6 +3,9 @@ from actor import Actor, Arena, Point
 #the tuple will contain ((start_x, start_y), (end_x, end_y)) of the png
 IDLE_RIGHT_ARMOR = ((5, 42), (26, 73))
 IDLE_LEFT_ARMOR = ((485, 42), (506, 74))
+IDLE_RIGHT_NAKED = ((6, 76), (25, 106))
+IDLE_LEFT_NAKED = ((486, 76), (505, 106))
+
 RUNNING_RIGHT_ARMOR = [
     ((39, 41),(63, 72)), 
     ((65, 41), (85, 74)), 
@@ -53,7 +56,7 @@ class Arthur(Actor):
         self.max_jump = 40
         self._djump = 4
         self._speed = 2
-        self._health = 2
+        self._health = 1
         
         #animation stats
         self._sprite_start, self._sprite_end = IDLE_RIGHT_ARMOR
@@ -97,24 +100,36 @@ class Arthur(Actor):
         if self._y + self._h < ah and self._jump == False:
             self._y += G
 
-        #checking_animations
+        ###########          ANIMATION ZONE      ################
         if self._frame >= 120:
             self._frame = 0
         else:
             self._frame += 1
 
+
+
         if self._dx == 0:
-            if self._direction == 1:
+            if self._direction == 1 and self._health == 2:
                 self._sprite_start, self._sprite_end = IDLE_LEFT_ARMOR
-            else:
+            elif self._direction == 0 and self._health == 2:
                 self._sprite_start, self._sprite_end = IDLE_RIGHT_ARMOR
-        else:
-            if self._direction == 1:
-                index = (self._frame//self._duration_frame)%(len(RUNNING_LEFT_ARMOR))
-                self._sprite_start, self._sprite_end = RUNNING_LEFT_ARMOR[index]
+            elif self._direction == 1 and self._health == 1:
+                self._sprite_start, self._sprite_end = IDLE_LEFT_NAKED
             else:
-                index = (self._frame//self._duration_frame)%(len(RUNNING_RIGHT_ARMOR))
-                self._sprite_start, self._sprite_end = RUNNING_RIGHT_ARMOR[index]
+                self._sprite_start, self._sprite_end = IDLE_RIGHT_NAKED
+        else:
+            if self._direction == 1 and self._health == 2:
+                animation = RUNNING_LEFT_ARMOR.copy()
+            elif self._direction == 1 and self._health == 1:   
+                animation = RUNNING_LEFT_NAKED.copy()
+            elif self._direction == 0 and self._health == 2:
+                animation = RUNNING_RIGHT_ARMOR.copy()
+            else:
+                animation = RUNNING_RIGHT_NAKED.copy()
+
+            index = (self._frame//self._duration_frame)%(len(animation))
+            self._sprite_start, self._sprite_end = animation[index]
+
 
 
 
