@@ -4,11 +4,11 @@ from Arthur import Arthur
 from math import cos, sin, radians
 
 
-x_view,y_view = 100,100
-w_view, h_view = 200,150
+x_view,y_view = 300,200
+w_view, h_view = 400,400
 def tick():
     g2d.clear_canvas()
-    global x_view,y_view
+    global x_view,y_view, w_view, h_view
     g2d.draw_image("https://fondinfo.github.io/sprites/ghosts-goblins-bg.png", (0,0),(x_view, y_view),(w_view,h_view) )
     for a in arena.actors():
         if a.sprite() != None:
@@ -18,16 +18,15 @@ def tick():
             pass  # g2d.draw_rect(a.pos(), a.size())
 
     arena.tick(g2d.current_keys())  # Game logic
-    
     if "ArrowUp" in g2d.current_keys():
-        y_view -= 5
+        y_view = max(y_view-5, 0)
     elif "ArrowDown" in g2d.current_keys():
-        y_view += 5    
+        y_view = min(y_view + 5, h_view)    
         
     elif "ArrowRight" in g2d.current_keys():
-        x_view += 5
+        x_view = min(x_view + 5, w_view)
     elif "ArrowLeft" in g2d.current_keys():
-        x_view -= 5  
+        x_view = max(x_view - 5, 0)
 
 
 def main():
