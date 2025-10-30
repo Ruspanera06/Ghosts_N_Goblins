@@ -17,13 +17,13 @@ def tick():
     g2d.draw_image("./assets/sprites/ghosts-goblins-bg.png", (-initial_image_x,-initial_image_y),(x_view, y_view),(w_view,h_view) )
 
     #zombie spawning chance
-    n = randrange(500)
+    n = randrange(150)
     if n == 0:
         for x in arena.actors():
-            if isinstance(x, Arthur) :
+            if isinstance(x, Arthur) and len(arena.actors()) == 1:
                 r = randint(20, 200)
                 direction = choice([1, -1])
-                z_pos = ((x.pos()[0] + (-1*direction*r)), x.pos()[1])
+                z_pos = ((x.pos()[0] + (-1*direction*r)), arena.size()[1] - 69)
                 arena.spawn(Zombie(z_pos, direction))
                 break
 

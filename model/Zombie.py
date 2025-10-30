@@ -51,6 +51,7 @@ class Zombie(Actor):
         self._speed = 2
         self._dx = dx*self._speed
         self._dy = 0
+        self._direction = dx
 
         # self._facing_right = True
         self._moving = True
@@ -61,7 +62,6 @@ class Zombie(Actor):
         #animation stats
         self._frame = 0
         self._duration_frame = 3
-        self._direction = 0 #0 = destra, 1 = sinistra
         self._sprite_start, self._sprite_end = ZOMBIE_RISE_RIGHT[0]  #inizia con lo sprite di uscita
         self._spawn_frame = 10
 
@@ -71,19 +71,17 @@ class Zombie(Actor):
         aw, ah = arena.size()
         ##########             WALKING LOGIC      ###############  
         if not self._spawn:
+            self._distance_walked += abs(self._dx)
             if self._distance_walked < self._distance_walkable:
                 self._moving = True 
-                self._distance_walked += self._dx
                 self._x += self._dx
             if self._distance_walked >= self._distance_walkable:
+                self._frame = 0
                 self._moving  = False
-                self._dx = 0        
+                self._spawn = True
+                self._dx = 0
 
         ###########          ANIMATION ZONE      ################
-        if self._frame >= 120:
-            self._frame = 0
-        else:
-            self._frame += 1
 
         if self._spawn:
             #           RISING ANIMATION
@@ -95,22 +93,33 @@ class Zombie(Actor):
                 if ((self._frame+1)//self._spawn_frame) >= len(animation):
                     self._spawn = not self._spawn
 
-
             #           BURY ANIMATION
             else:
-                if self._dx  > 0:
+                print(self._frame)
+                if self._direction > 0:
                     animation = ZOMBIE_RISE_RIGHT.copy()[::-1]
                 else:
                     animation = ZOMBIE_RISE_LEFT.copy()[::-1]
-                # if (self._frame//self._spawn_frame) > len(animation):
-                #     arena.kill(self)
+
+                if ((self._frame+1)//self._spawn_frame) > len(animation)-1:
+                    arena.kill(self)
             index = (self._frame//self._spawn_frame)%(len(animation))
             self._sprite_start, self._sprite_end = animation[index]
         #                       WALKING ANIMATION
-        # else:
+        else:
+            if self._dx != 0:
+                if self._dx  > 0:
+                    animation = ZOMBIE_WALK_RIGHT.copy()
+                else:
+                    animation = ZOMBIE_WALK_LEFT.copy()
+                index = (self._frame//self._spawn_frame)%(len(animation))
+                self._sprite_start, self._sprite_end = animation[index]
 
         
-
+        if self._frame >= 120:
+            self._frame = 0
+        else:
+            self._frame += 1
 
         self._x = min(max(self._x, 0), aw - self._w)  # clamp
         self._y = min(max(self._y, 0), ah - self._h)  # clamp

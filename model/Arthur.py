@@ -54,8 +54,8 @@ class Arthur(Actor):
         self._dx, self._dy = 0, 0
         self._jump = False
         self.max_jump = 40
-        self._djump = 4
-        self._speed = 2
+        self._djump = 15
+        self._speed = 3
         self._health = 1
         
         #animation stats
@@ -66,19 +66,16 @@ class Arthur(Actor):
         
 
     def move(self, arena: Arena):
-        G = 5
+        G = 2
         aw, ah = arena.size()
-        #-45 perchè così tocca il suolo
+        #-45 in order to make arthur touch the ground
         ah -=45
         self._dx = 0
-        # for other in arena.collisions():
-        #     if isinstance(other, Arthur):
-        #         self.hit(arena)
 
         keys = arena.current_keys()
-        if ("Spacebar" in keys or "w" in keys) and self._y + self._h == ah :
+        if ("Spacebar" in keys or "w" in keys) and self._y + self._h == ah:
             self._jump = True
-            self._dy -= self._djump
+            self._dy = -self._djump
         elif self._y + self._h == ah:
             self._dy = 0
             self._jump = False
@@ -90,15 +87,11 @@ class Arthur(Actor):
             self._dx += self._speed
         
         self._x += self._dx
+
+        self._dy += G
+        self._y += self._dy
         self._x = min(max(self._x, 5), aw - self._w)  # clamp
         self._y = min(max(self._y, 5), ah - self._h)  # clamp
-
-        if self._y > ah-self.max_jump and self._jump == True:
-            self._y += self._dy
-        else:
-            self._jump = False
-        if self._y + self._h < ah and self._jump == False:
-            self._y += G
 
         ###########          ANIMATION ZONE      ################
         if self._frame >= 120:
