@@ -1,8 +1,8 @@
 from random import choice, randrange, randint
 from actor import Actor, Arena, Point
-from Arthur import Arthur
+from model.Arthur import Arthur
 from math import cos, sin, radians
-from Zombie import Zombie
+from model.Zombie import Zombie
 
 x_view,y_view = 2,10
 w_view, h_view = 400,239
@@ -14,11 +14,11 @@ def tick():
     global initial_image_x, initial_image_y, end_image_x, end_image_y
     g2d.clear_canvas()
     global x_view,y_view, w_view, h_view
-    g2d.draw_image("./ghosts-goblins-bg.png", (-initial_image_x,-initial_image_y),(x_view, y_view),(w_view,h_view) )
+    g2d.draw_image("./assets/sprites/ghosts-goblins-bg.png", (-initial_image_x,-initial_image_y),(x_view, y_view),(w_view,h_view) )
     for a in arena.actors():
         if a.sprite() != None:
             x, y = a.pos()
-            g2d.draw_image("./ghosts-goblins.png", (x - x_view, y - y_view), a.sprite(), a.size())
+            g2d.draw_image("./assets/sprites/ghosts-goblins.png", (x - x_view, y - y_view), a.sprite(), a.size())
         else:
             pass  # g2d.draw_rect(a.pos(), a.size())
 
