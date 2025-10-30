@@ -74,6 +74,7 @@ class Zombie(Actor):
             if self._distance_walked < self._distance_walkable:
                 self._moving = True 
                 self._distance_walked += self._dx
+                self._x += self._dx
             if self._distance_walked >= self._distance_walkable:
                 self._moving  = False
                 self._dx = 0        
