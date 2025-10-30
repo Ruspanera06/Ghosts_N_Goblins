@@ -95,7 +95,6 @@ class Zombie(Actor):
 
             #           BURY ANIMATION
             else:
-                print(self._frame)
                 if self._direction > 0:
                     animation = ZOMBIE_RISE_RIGHT.copy()[::-1]
                 else:

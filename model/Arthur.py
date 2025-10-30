@@ -1,4 +1,5 @@
 from actor import Actor, Arena, Point
+from random import choice, randint
 #animations sprites
 #the tuple will contain ((start_x, start_y), (end_x, end_y)) of the png
 IDLE_RIGHT_ARMOR = ((5, 42), (26, 73))
@@ -13,7 +14,7 @@ JUMP_RIGHT_ARMOR = [
 JUMP_LEFT_ARMOR = [
     ((304, 28), (332, 56)),
     ((335, 28), (368, 56))
-]
+][::1]
 
 JUMP_RIGHT_NAKED = [
     ((144, 61), (174, 88)),
@@ -22,7 +23,7 @@ JUMP_RIGHT_NAKED = [
 JUMP_LEFT_NAKED = [
     ((305, 61), (329, 88)),
     ((337, 61), (367, 88))
-]
+][::-1]
 
 
 RUNNING_RIGHT_ARMOR = [
@@ -81,7 +82,9 @@ class Arthur(Actor):
         self._sprite_start, self._sprite_end = IDLE_RIGHT_ARMOR
         self._frame = 0
         self._duration_frame = 3
-        self._direction = 0 #0 = destra, 1 = sinistra
+        self._direction = 0 
+        self._jump_anim = False
+        self._i_jump = None
         
 
     def move(self, arena: Arena):
@@ -94,10 +97,13 @@ class Arthur(Actor):
         keys = arena.current_keys()
         if ("Spacebar" in keys or "w" in keys) and self._y + self._h == ah:
             self._jump = True
+            self._jump_anim = True
             self._dy = -self._djump
         elif self._y + self._h == ah:
             self._dy = 0
             self._jump = False
+            self._jump_anim = False
+            self._i_jump = None
         if "a" in keys:
             self._dx -= self._speed
             self._direction = 1
@@ -118,9 +124,23 @@ class Arthur(Actor):
         else:
             self._frame += 1
 
+        #________________JUMP FRAME LOGIC________________
+        if self._jump :
+            if self._jump_anim:
+                if self._i_jump == None:
+                    self._i_jump = randint(0,1)
+                if self._direction == 1 and self._health == 2:
+                    self._sprite_start, self._sprite_end = JUMP_LEFT_ARMOR[self._i_jump]
+                elif self._direction == 0 and self._health == 2:
+                    self._sprite_start, self._sprite_end = JUMP_RIGHT_ARMOR[self._i_jump]
+                elif self._direction == 1 and self._health == 1:
+                    self._sprite_start, self._sprite_end = JUMP_LEFT_NAKED[self._i_jump]
+                else:
+                    self._sprite_start, self._sprite_end = JUMP_RIGHT_NAKED[self._i_jump]
+        
+        #________________IDLE FRAME LOGIC________________
 
-
-        if self._dx == 0:
+        elif self._dx == 0:
             self._frame = 0
             if self._direction == 1 and self._health == 2:
                 self._sprite_start, self._sprite_end = IDLE_LEFT_ARMOR
@@ -130,6 +150,9 @@ class Arthur(Actor):
                 self._sprite_start, self._sprite_end = IDLE_LEFT_NAKED
             else:
                 self._sprite_start, self._sprite_end = IDLE_RIGHT_NAKED
+
+        #________________RUNNING FRAME LOGIC________________
+
         else:
             if self._direction == 1 and self._health == 2:
                 animation = RUNNING_LEFT_ARMOR.copy()
