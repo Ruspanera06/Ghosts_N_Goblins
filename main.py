@@ -15,6 +15,19 @@ def tick():
     g2d.clear_canvas()
     global x_view,y_view, w_view, h_view
     g2d.draw_image("./assets/sprites/ghosts-goblins-bg.png", (-initial_image_x,-initial_image_y),(x_view, y_view),(w_view,h_view) )
+
+    #zombie spawning chance
+    n = randrange(500)
+    if n == 0:
+        for x in arena.actors():
+            if isinstance(x, Arthur) :
+                r = randint(20, 200)
+                direction = choice([1, -1])
+                z_pos = ((x.pos()[0] + (-1*direction*r)), x.pos()[1])
+                arena.spawn(Zombie(z_pos, direction))
+                break
+
+    ######      drawing logic       #####
     for a in arena.actors():
         if a.sprite() != None:
             x, y = a.pos()
@@ -41,8 +54,8 @@ def main():
     #-45
     arena = Arena((3585, h_view))
     arena.spawn(Arthur((100, 150)))
-    arena.spawn(Zombie((300, 165)))
-    arena.spawn(Zombie((300, 165)))
+    # arena.spawn(Zombie((300, 165)))
+    # arena.spawn(Zombie((300, 165)))
     g2d.init_canvas((w_view-2,h_view-10),2)
     g2d.main_loop(tick)
 

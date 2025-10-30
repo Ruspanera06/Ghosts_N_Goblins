@@ -1,88 +1,115 @@
 from actor import Actor, Arena, Point
 from random import choice, randint
 
-sprite_x = 652
 #ZOMBIE_RISE_RIGHTs=   
-# === Uscita dal terreno (RISING) ===
-ZOMBIE_RISE_RIGHT = [
-    ((630, 70), (652, 96)),# testa che emerge
-    ((654, 70), (676, 98)),   # busto visibile
-    ((678, 70), (700, 100)),  # metà corpo
-    ((702, 70), (724, 102)),  # quasi fuori
-    ((726, 70), (748, 104)),  # in piedi
+# ===  (RISING FROM THE GROUND) === 
+ZOMBIE_RISE_LEFT = [
+    ((511, 64), (528, 97)),   # testa che emerge
+    ((532, 64), (558, 97)),   # busto visibile
+    ((561, 64), (581, 97)),   # metà corpo
+    ((584, 64), (607, 97)),   # quasi fuori
 ]
 
 # Mirroring a sinistra
-ZOMBIE_RISE_LEFT = []
-for s in ZOMBIE_RISE_RIGHT:
-    x = sprite_x - s[0][0] - s[1][0]
+sprite_x_inizio = 511
+sprite_end = 794
+ZOMBIE_RISE_RIGHT = []
+for s in ZOMBIE_RISE_LEFT:
+    x = sprite_end - (abs(sprite_x_inizio - s[0][0])) - (abs(s[0][0] - s[1][0]))
     y = s[0][1]
-    size_x = x + s[1][0]
+    size_x = x + (abs(s[0][0] - s[1][0]))
     size_y = s[1][1]
-    ZOMBIE_RISE_LEFT.append(((x, y), (size_x, size_y)))
+    ZOMBIE_RISE_RIGHT.append(((x, y), (size_x, size_y)))
 
 
 # === Camminata (WALKING) ===
-ZOMBIE_WALK_RIGHT = [
-    ((630, 110), (652, 140)),  # passo 1
-    ((654, 110), (676, 142)),  # passo 2
-    ((678, 110), (700, 142)),  # passo 3
-    ((702, 110), (724, 142)),  # passo 4
-    ((726, 110), (748, 142)),  # passo 5
-    ((750, 110), (772, 142)),  # passo 6 (facoltativo)
+ZOMBIE_WALK_LEFT = [
+    ((584, 64), (607, 97)),  # passo 1
+    ((609, 64), (629, 97)),  # passo 2
+    ((630, 64), (652, 97)),  # passo 3
 ]
+ZOMBIE_WALK_LEFT = ZOMBIE_WALK_LEFT[::-1]
+# print(ZOMBIE_WALK_LEFT[::-1])
 
 # Mirroring a sinistra
-ZOMBIE_WALK_LEFT = []
-for s in ZOMBIE_WALK_RIGHT:
-    x = sprite_x - s[0][0] - s[1][0]
+sprite_x_inizio = 584
+sprite_end = 721
+ZOMBIE_WALK_RIGHT = []
+for s in ZOMBIE_WALK_LEFT:
+    x = sprite_end - (abs(sprite_x_inizio - s[0][0])) - (abs(s[0][0] - s[1][0]))
     y = s[0][1]
-    size_x = x + s[1][0]
+    size_x = x + (abs(s[0][0] - s[1][0]))
     size_y = s[1][1]
-    ZOMBIE_WALK_LEFT.append(((x, y), (size_x, size_y)))
-
+    ZOMBIE_WALK_RIGHT.append(((x, y), (size_x, size_y)))
 
 
 class Zombie(Actor):
-    def __init__(self, pos):
+    def __init__(self, pos, dx):
         self._x, self._y = pos
         self._w, self._h = 23, 35
-        self._spawn = False 
+        self._spawn = True 
         self._speed = 2
-        self._dx = choice([-self._speed,self._speed]) 
+        self._dx = dx*self._speed
         self._dy = 0
 
-        self._facing_right = True
+        # self._facing_right = True
         self._moving = True
-
         self._distance_walkable = randint(150,300) #distanze che può percorrere
         self._distance_walked = 0
 
+
+        #animation stats
+        self._frame = 0
+        self._duration_frame = 3
+        self._direction = 0 #0 = destra, 1 = sinistra
         self._sprite_start, self._sprite_end = ZOMBIE_RISE_RIGHT[0]  #inizia con lo sprite di uscita
+        self._spawn_frame = 10
+
+
 
     def move(self, arena: Arena):
         aw, ah = arena.size()
-        if self._moving:
-            self._x += self._dx 
+        ##########             WALKING LOGIC      ###############  
+        if not self._spawn:
+            if self._distance_walked < self._distance_walkable:
+                self._moving = True 
+                self._distance_walked += self._dx
+            if self._distance_walked >= self._distance_walkable:
+                self._moving  = False
+                self._dx = 0        
 
-        if self._x <=0 or self._x+self._w >= aw: #"rimbalzo zombie" contro l'arena
-            self._dx = -self._dx
-            self._moving = True
-
-        if self._distance_walked < self._distance_walkable:
-            self._moving = True 
-            self._distance_walked += abs(self._dx) #aggiungo i passi anche se sono negativi
-
-        elif self._distance_walked >= self._distance_walkable:
-            self._moving  = False
-            self._dx = 0
-            self._dy = 0
-             
-
-        if self._dx>0: #dove lo zombi guarda (per modifica sprite..)"
-            self._facing_right = True 
+        ###########          ANIMATION ZONE      ################
+        if self._frame >= 120:
+            self._frame = 0
         else:
-            self._facing_right = False     
+            self._frame += 1
+
+        if self._spawn:
+            #           RISING ANIMATION
+            if self._moving:
+                if self._dx  > 0:
+                    animation = ZOMBIE_RISE_RIGHT.copy()
+                else:
+                    animation = ZOMBIE_RISE_LEFT.copy()
+                if ((self._frame+1)//self._spawn_frame) >= len(animation):
+                    self._spawn = not self._spawn
+
+
+            #           BURY ANIMATION
+            else:
+                if self._dx  > 0:
+                    animation = ZOMBIE_RISE_RIGHT.copy()[::-1]
+                else:
+                    animation = ZOMBIE_RISE_LEFT.copy()[::-1]
+                # if (self._frame//self._spawn_frame) > len(animation):
+                #     arena.kill(self)
+            index = (self._frame//self._spawn_frame)%(len(animation))
+            self._sprite_start, self._sprite_end = animation[index]
+        #                       WALKING ANIMATION
+        # else:
+
+        
+
 
         self._x = min(max(self._x, 0), aw - self._w)  # clamp
         self._y = min(max(self._y, 0), ah - self._h)  # clamp

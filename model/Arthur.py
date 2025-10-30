@@ -109,6 +109,7 @@ class Arthur(Actor):
 
 
         if self._dx == 0:
+            self._frame = 0
             if self._direction == 1 and self._health == 2:
                 self._sprite_start, self._sprite_end = IDLE_LEFT_ARMOR
             elif self._direction == 0 and self._health == 2:
