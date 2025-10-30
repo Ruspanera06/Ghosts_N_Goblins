@@ -2,7 +2,7 @@ from random import choice, randrange, randint
 from actor import Actor, Arena, Point
 from Arthur import Arthur
 from math import cos, sin, radians
-
+from Zombie import Zombie
 
 x_view,y_view = 2,10
 w_view, h_view = 400,239
@@ -41,7 +41,8 @@ def main():
     #-45
     arena = Arena((3585, h_view))
     arena.spawn(Arthur((100, 150)))
-
+    arena.spawn(Zombie((300, 165)))
+    arena.spawn(Zombie((300, 165)))
     g2d.init_canvas((w_view-2,h_view-10),2)
     g2d.main_loop(tick)
 
