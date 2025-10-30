@@ -3,6 +3,9 @@ from actor import Actor, Arena, Point
 #the tuple will contain ((start_x, start_y), (end_x, end_y)) of the png
 IDLE_RIGHT_ARMOR = ((5, 42), (26, 73))
 IDLE_LEFT_ARMOR = ((485, 42), (506, 74))
+IDLE_RIGHT_NAKED = ((6, 76), (25, 106))
+IDLE_LEFT_NAKED = ((486, 76), (505, 106))
+
 RUNNING_RIGHT_ARMOR = [
     ((39, 41),(63, 72)), 
     ((65, 41), (85, 74)), 
@@ -13,9 +16,10 @@ sprite_x = 511
 RUNNING_LEFT_ARMOR = []
 #mirroring RUNNING_RIGHT_ARMOR so it become RUNNING_LEF_ARMOR
 for s in RUNNING_RIGHT_ARMOR:
-    x = sprite_x - s[0][0] - s[1][0]
+    s_x = (s[1][0]-s[0][0])
+    x = sprite_x - s[0][0] - s_x
     y = s[0][1]
-    size_x = x + s[1][0]
+    size_x = x + s_x
     size_y = s[1][1]
     RUNNING_LEFT_ARMOR.append(
         ((x, y), (size_x, size_y))
@@ -31,9 +35,10 @@ RUNNING_RIGHT_NAKED = [
 RUNNING_LEFT_NAKED = []
 #mirroring RUNNING_RIGHT_ARMOR so it become RUNNING_LEF_ARMOR
 for s in RUNNING_RIGHT_NAKED:
-    x = sprite_x - s[0][0] - s[1][0]
+    s_x = (s[1][0]-s[0][0])
+    x = sprite_x - s[0][0] - s_x
     y = s[0][1]
-    size_x = x + s[1][0]
+    size_x = x + s_x
     size_y = s[1][1]
     RUNNING_LEFT_NAKED.append(
         ((x, y), (size_x, size_y))
@@ -51,12 +56,12 @@ class Arthur(Actor):
         self.max_jump = 40
         self._djump = 4
         self._speed = 2
-        self._health = 2
+        self._health = 1
         
         #animation stats
         self._sprite_start, self._sprite_end = IDLE_RIGHT_ARMOR
         self._frame = 0
-        self._duration_frame = 10
+        self._duration_frame = 3
         self._direction = 0 #0 = destra, 1 = sinistra
         
 
@@ -95,18 +100,37 @@ class Arthur(Actor):
         if self._y + self._h < ah and self._jump == False:
             self._y += G
 
-        #checking_animations
+        ###########          ANIMATION ZONE      ################
         if self._frame >= 120:
             self._frame = 0
         else:
             self._frame += 1
 
+
+
         if self._dx == 0:
-            if self._direction == 1:
+            if self._direction == 1 and self._health == 2:
                 self._sprite_start, self._sprite_end = IDLE_LEFT_ARMOR
-            else:
+            elif self._direction == 0 and self._health == 2:
                 self._sprite_start, self._sprite_end = IDLE_RIGHT_ARMOR
-        # elif self._dx > 0:
+            elif self._direction == 1 and self._health == 1:
+                self._sprite_start, self._sprite_end = IDLE_LEFT_NAKED
+            else:
+                self._sprite_start, self._sprite_end = IDLE_RIGHT_NAKED
+        else:
+            if self._direction == 1 and self._health == 2:
+                animation = RUNNING_LEFT_ARMOR.copy()
+            elif self._direction == 1 and self._health == 1:   
+                animation = RUNNING_LEFT_NAKED.copy()
+            elif self._direction == 0 and self._health == 2:
+                animation = RUNNING_RIGHT_ARMOR.copy()
+            else:
+                animation = RUNNING_RIGHT_NAKED.copy()
+
+            index = (self._frame//self._duration_frame)%(len(animation))
+            self._sprite_start, self._sprite_end = animation[index]
+
+
 
 
         
