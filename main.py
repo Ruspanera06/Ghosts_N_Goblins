@@ -3,6 +3,8 @@ from actor import Actor, Arena, Point
 from model.Arthur import Arthur
 from math import cos, sin, radians
 from model.Zombie import Zombie
+from model.Gravestone import Gravestone
+from model.Platform import Platform
 
 x_view,y_view = 2,10
 w_view, h_view = 400,239

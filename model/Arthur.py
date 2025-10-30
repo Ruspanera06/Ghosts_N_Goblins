@@ -69,7 +69,6 @@ for s in RUNNING_RIGHT_NAKED:
 class Arthur(Actor):
     def __init__(self, pos):
         self._x, self._y = pos
-        self._dx, self._ = 0, 0
         self._w, self._h = 20, 20
         self._dx, self._dy = 0, 0
         self._jump = False
@@ -99,6 +98,7 @@ class Arthur(Actor):
             self._jump = True
             self._jump_anim = True
             self._dy = -self._djump
+            self._i_jump = None
         elif self._y + self._h == ah:
             self._dy = 0
             self._jump = False
