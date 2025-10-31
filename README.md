@@ -30,4 +30,4 @@ To recreate a classic arcade experience while improving my understanding of **ga
 ---
 
 ## 🧑‍💻 Author  
-Developed by [**Ruspanera06**](https://github.com/Ruspanera06) – University of Parma 🎓
+Developed by [**Ruspanera06**](https://github.com/Ruspanera06) and [**Abdul1-1**](https://github.com/Abdul1-1) – University of Parma 🎓
