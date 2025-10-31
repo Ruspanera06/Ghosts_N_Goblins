@@ -5,6 +5,8 @@ from math import cos, sin, radians
 from model.Zombie import Zombie
 from model.Gravestone import Gravestone
 from model.Platform import Platform
+from model.Flame import Flame
+from model.Torch import Torch
 
 x_view,y_view = 2,10
 w_view, h_view = 400,239
@@ -53,11 +55,8 @@ def main():
     global w_view, h_view
     global g2d, arena
     import g2d  # game classes do not depend on g2d
-    #-45
     arena = Arena((3585, h_view))
     arena.spawn(Arthur((100, 150)))
-    # arena.spawn(Zombie((300, 165)))
-    # arena.spawn(Zombie((300, 165)))
     g2d.init_canvas((w_view-2,h_view-10),2)
     g2d.main_loop(tick)
 

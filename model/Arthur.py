@@ -1,5 +1,6 @@
 from actor import Actor, Arena, Point
 from random import choice, randint
+from model.Torch import Torch
 #animations sprites
 #the tuple will contain ((start_x, start_y), (end_x, end_y)) of the png
 IDLE_RIGHT_ARMOR = ((5, 42), (26, 73))
@@ -76,6 +77,8 @@ class Arthur(Actor):
         self._djump = 15
         self._speed = 3
         self._health = 1
+        self._attack_speed = 10
+        self._attack_frame = self._attack_speed
         
         #animation stats
         self._sprite_start, self._sprite_end = IDLE_RIGHT_ARMOR
@@ -84,6 +87,7 @@ class Arthur(Actor):
         self._direction = 0 
         self._jump_anim = False
         self._i_jump = None
+        
         
 
     def move(self, arena: Arena):
@@ -111,6 +115,12 @@ class Arthur(Actor):
             self._direction = 0
             self._dx += self._speed
         
+        if "f" in keys:
+            if self._attack_frame == self._attack_speed:
+                self.throw_Torch(arena)
+                self._attack_frame = 0
+        
+        self._attack_frame = min(self._attack_frame+1, self._attack_speed)        
         self._x += self._dx
 
         self._dy += G
@@ -165,14 +175,22 @@ class Arthur(Actor):
 
             index = (self._frame//self._duration_frame)%(len(animation))
             self._sprite_start, self._sprite_end = animation[index]
-
-
-
-
         
+    def throw_Torch(self, arena: Arena):
+        y = self.pos()[1] + 2
+        x = self.pos()[0] if self._direction == 1 else self.pos()[0] + self.size()[0]
+        # if self._direction == 1:
+        #     x = self.pos()[0]
+        # else:
+        #     x = self.pos()[0] + self.size()[0]
+        direction = 0
+        if self._direction == 1:
+            direction = -1
+        else:
+            direction = 1
+        arena.spawn(Torch((x, y), direction))
 
     def hit(self, arena: Arena):
-
         arena.kill(self)
 
     def pos(self) -> Point:
