@@ -21,7 +21,7 @@ class Torch(Actor):
         self._x, self._y = pos
         self._w, self._h = 15, 14
         self._spawn = True 
-        self._speed = 4
+        self._speed = 10
         self._dx = dx*self._speed
         self._dy = 0
         self._direction = dx
@@ -30,7 +30,7 @@ class Torch(Actor):
     def move(self, arena:Arena):
         G = 0.2
         aw, ah = arena.size()
-        ah -= 45
+        ah -= 30
         if self._y == ah - self._h:
             self._dx = 0
             # self.hit(self, arena)
