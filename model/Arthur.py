@@ -1,6 +1,7 @@
 from actor import Actor, Arena, Point
 from random import choice, randint
 from model.Torch import Torch
+from model.Platform import Platform 
 #animations sprites
 #the tuple will contain ((start_x, start_y), (end_x, end_y)) of the png
 IDLE_RIGHT_ARMOR = ((5, 42), (26, 73))
@@ -91,91 +92,148 @@ class Arthur(Actor):
         
 
     def move(self, arena: Arena):
-        G = 2
-        aw, ah = arena.size()
-        #-45 in order to make arthur touch the ground
-        ah -=45
-        self._dx = 0
+            G = 2
+            aw, ah = arena.size()
+            keys = arena.current_keys()
 
-        keys = arena.current_keys()
-        if ("Spacebar" in keys or "w" in keys) and self._y + self._h == ah:
-            self._jump = True
-            self._jump_anim = True
-            self._dy = -self._djump
-            self._i_jump = None
-        elif self._y + self._h == ah:
-            self._dy = 0
-            self._jump = False
-            self._jump_anim = False
-            self._i_jump = None
-        if "a" in keys:
-            self._dx -= self._speed
-            self._direction = 1
-        elif "d" in keys:
-            self._direction = 0
-            self._dx += self._speed
-        
-        if "f" in keys:
-            if self._attack_frame == self._attack_speed:
-                self.throw_Torch(arena)
-                self._attack_frame = 0
-        
-        self._attack_frame = min(self._attack_frame+1, self._attack_speed)        
-        self._x += self._dx
+            # ==========================================================
+            # 1. GESTIONE INPUT E ATTACCO (Il tuo codice, invariato)
+            # ==========================================================
 
-        self._dy += G
-        self._y += self._dy
-        self._x = min(max(self._x, 5), aw - self._w)  # clamp
-        self._y = min(max(self._y, 5), ah - self._h)  # clamp
+            self._dx = 0
+            if "a" in keys:
+                self._dx -= self._speed
+                self._direction = 1
+            elif "d" in keys:
+                self._direction = 0
+                self._dx += self._speed
+            
+            if "f" in keys:
+                if self._attack_frame == self._attack_speed:
+                    self.throw_Torch(arena)
+                    self._attack_frame = 0
+            
+            self._attack_frame = min(self._attack_frame+1, self._attack_speed)
 
-        ###########          ANIMATION ZONE      ################
-        if self._frame >= 120:
-            self._frame = 0
-        else:
-            self._frame += 1
+            # ==========================================================
+            # 2. GESTIONE FISICA E COLLISIONI (Logica di Mario)
+            #    (Questa parte SOSTITUISCE la tua vecchia fisica)
+            # ==========================================================
 
-        #________________JUMP FRAME LOGIC________________
-        if self._jump :
-            if self._jump_anim:
+            # Partiamo dal presupposto di essere in aria
+            self._is_grounded = False
+
+            # 2.1 Controllo Pavimento (Se vuoi mantenere un pavimento di "base" oltre alle piattaforme)
+            floor_y = ah - 45  # Il tuo "pavimento" originale
+            if self._y + self._h >= floor_y and self._dy >= 0:
+                self._y = floor_y - self._h
+                self._dy = 0
+                self._is_grounded = True
+                self._jump_anim = False # Siamo atterrati
+
+            # 2.2 Controllo Piattaforme (La logica a 4 lati di Mario)
+            for other in arena.collisions():
+                if isinstance(other, Platform):
+                    plat_x, plat_y = other.pos()
+                    plat_w, plat_h = other.size()
+
+                    # 1. Atterraggio ⤓ (Stiamo cadendo e siamo sopra la piattaforma)
+                    if self._y < plat_y and self._dy >= 0:
+                        self._y = plat_y - self._h  # Atterrato
+                        self._dy = 0
+                        self._is_grounded = True
+                        self._jump_anim = False # Siamo atterrati
+                    
+                    # 2. Testa sbattuta ⤒ (Stiamo salendo e siamo sotto la piattaforma)
+                    elif self._y + self._h > plat_y + plat_h and self._dy <= 0:
+                        self._y = plat_y + plat_h + 1
+                        self._dy = 0
+                    
+                    # 3. Scontro a sinistra ⇥ (Andiamo a dx e colpiamo il lato sx)
+                    elif self._x < plat_x and self._dx >= 0:
+                        self._x = plat_x - self._w
+                        self._dx = 0 # Blocca movimento orizzontale
+                    
+                    # 4. Scontro a destra ⇤ (Andiamo a sx e colpiamo il lato dx)
+                    elif self._x + self._w > plat_x + plat_w and self._dx <= 0:
+                        self._x = plat_x + plat_w
+                        self._dx = 0 # Blocca movimento orizzontale
+
+            # 2.3 Gestione Salto (Controlla il tasto ORA che sappiamo se siamo a terra)
+            if ("Spacebar" in keys or "w" in keys) and self._is_grounded:
+                self._dy = -self._djump  # Salta! (Usa la tua variabile _djump)
+                self._jump_anim = True
+                self._i_jump = None
+                
+            # ==========================================================
+            # 3. APPLICA FISICA E MOVIMENTO FINALE
+            # ==========================================================
+            
+            # Applica gravità
+            self._dy += G 
+            
+            # Applica movimento
+            self._x += self._dx
+            self._y += self._dy
+
+            # Clamp ai bordi dell'arena (Il tuo clamp per X, ma per Y solo in alto)
+            self._x = min(max(self._x, 5), aw - self._w)
+            self._y = max(self._y, 5) # Clamp solo per il "cielo"
+                                    # Il fondo è gestito da 'floor_y' e dalle piattaforme
+
+
+            # ==========================================================
+            # 4. ANIMATION ZONE (Il tuo codice, invariato)
+            # ==========================================================
+            
+            if self._frame >= 120:
+                self._frame = 0
+            else:
+                self._frame += 1
+
+            #________________JUMP FRAME LOGIC________________
+            if self._jump_anim : # (Ho rinominato il tuo `self._jump` in `self._jump_anim`
+                                #  perché ha senso, ma puoi ri-cambiarlo se preferisci)
                 if self._i_jump == None:
                     self._i_jump = randint(0,1)
                 if self._direction == 1 and self._health == 2:
                     self._sprite_start, self._sprite_end = JUMP_LEFT_ARMOR[self._i_jump]
+                # ... (TUTTA LA TUA LOGICA DI ANIMAZIONE RESTA QUI, IDENTICA) ...
                 elif self._direction == 0 and self._health == 2:
                     self._sprite_start, self._sprite_end = JUMP_RIGHT_ARMOR[self._i_jump]
                 elif self._direction == 1 and self._health == 1:
                     self._sprite_start, self._sprite_end = JUMP_LEFT_NAKED[self._i_jump]
                 else:
                     self._sprite_start, self._sprite_end = JUMP_RIGHT_NAKED[self._i_jump]
-        
-        #________________IDLE FRAME LOGIC________________
+            
+            #________________IDLE FRAME LOGIC________________
+            elif self._dx == 0:
+                self._frame = 0
+                if self._direction == 1 and self._health == 2:
+                    self._sprite_start, self._sprite_end = IDLE_LEFT_ARMOR
+                # ... (TUTTA LA TUA LOGICA DI ANIMAZIONE RESTA QUI, IDENTICA) ...
+                elif self._direction == 0 and self._health == 2:
+                    self._sprite_start, self._sprite_end = IDLE_RIGHT_ARMOR
+                elif self._direction == 1 and self._health == 1:
+                    self._sprite_start, self._sprite_end = IDLE_LEFT_NAKED
+                else:
+                    self._sprite_start, self._sprite_end = IDLE_RIGHT_NAKED
 
-        elif self._dx == 0:
-            self._frame = 0
-            if self._direction == 1 and self._health == 2:
-                self._sprite_start, self._sprite_end = IDLE_LEFT_ARMOR
-            elif self._direction == 0 and self._health == 2:
-                self._sprite_start, self._sprite_end = IDLE_RIGHT_ARMOR
-            elif self._direction == 1 and self._health == 1:
-                self._sprite_start, self._sprite_end = IDLE_LEFT_NAKED
+            #________________RUNNING FRAME LOGIC________________
             else:
-                self._sprite_start, self._sprite_end = IDLE_RIGHT_NAKED
+                if self._direction == 1 and self._health == 2:
+                    animation = RUNNING_LEFT_ARMOR.copy()
+                # ... (TUTTA LA TUA LOGICA DI ANIMAZIONE RESTA QUI, IDENTICA) ...
+                elif self._direction == 1 and self._health == 1:  
+                    animation = RUNNING_LEFT_NAKED.copy()
+                elif self._direction == 0 and self._health == 2:
+                    animation = RUNNING_RIGHT_ARMOR.copy()
+                else:
+                    animation = RUNNING_RIGHT_NAKED.copy()
 
-        #________________RUNNING FRAME LOGIC________________
-
-        else:
-            if self._direction == 1 and self._health == 2:
-                animation = RUNNING_LEFT_ARMOR.copy()
-            elif self._direction == 1 and self._health == 1:   
-                animation = RUNNING_LEFT_NAKED.copy()
-            elif self._direction == 0 and self._health == 2:
-                animation = RUNNING_RIGHT_ARMOR.copy()
-            else:
-                animation = RUNNING_RIGHT_NAKED.copy()
-
-            index = (self._frame//self._duration_frame)%(len(animation))
-            self._sprite_start, self._sprite_end = animation[index]
-        
+                index = (self._frame//self._duration_frame)%(len(animation))
+                self._sprite_start, self._sprite_end = animation[index]
+            
     def throw_Torch(self, arena: Arena):
         y = self.pos()[1] + 2
         x = self.pos()[0] if self._direction == 1 else self.pos()[0] + self.size()[0]
