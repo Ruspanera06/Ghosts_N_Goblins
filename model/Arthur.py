@@ -294,7 +294,9 @@ class Arthur(Actor):
         arena.spawn(Torch((x, y), direction))
 
     def hit(self, arena: Arena):
-        arena.kill(self)
+        self._health -= 1
+        if self._health <= 0:
+            arena.kill(self)
 
     def pos(self) -> Point:
         return self._x, self._y
