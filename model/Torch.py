@@ -1,6 +1,7 @@
 from actor import Actor, Arena, Point
 from random import choice, randint
 from model.Flame import Flame
+from model.Zombie import Zombie
 
 #___________        ANIMATIONS          ____________
 THROW_RIGHT = [
@@ -44,6 +45,18 @@ class Torch(Actor):
         self._y += G
         self._x = min(max(self._x, 5), aw - self._w)  # clamp
         self._y = min(max(self._y, 5), ah - self._h)  # clamp
+
+        #________________       Collision Detection     ________________
+        for other in arena.collisions():
+                if isinstance(other, Zombie):
+                    x, y = other.pos()
+                    w, h = other.size()
+                    
+                    if (self._x >= x and self._x <= x+h) or  (x <= self._x + self._w <= x+h) :
+                        if  (y <= self._y <= y+h) or (y <= self._y + self._h <= y+h):
+                            other.hit(arena)
+                            self.hit(arena)
+
 
         #________________       Animation Zone     ________________
 

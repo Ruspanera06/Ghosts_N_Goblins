@@ -92,7 +92,6 @@ class Zombie(Actor):
                     animation = ZOMBIE_RISE_LEFT.copy()
                 if ((self._frame+1)//self._spawn_frame) >= len(animation):
                     self._spawn = not self._spawn
-
             #           BURY ANIMATION
             else:
                 if self._direction > 0:

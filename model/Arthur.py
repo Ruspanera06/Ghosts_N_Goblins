@@ -134,9 +134,7 @@ class Arthur(Actor):
             aw, ah = arena.size()
             keys = arena.current_keys()
 
-            # ==========================================================
-            # 1. GESTIONE INPUT E ATTACCO (Il tuo codice, invariato)
-            # ==========================================================
+            #_________________        Input Control Zone        ________________
 
             self._dx = 0
             if "a" in keys:
@@ -154,53 +152,50 @@ class Arthur(Actor):
             
             self._attack_frame = min(self._attack_frame+1, self._attack_speed)
 
-            # ==========================================================
-            # 2. GESTIONE FISICA E COLLISIONI (Logica di Mario)
-            #    (Questa parte SOSTITUISCE la tua vecchia fisica)
-            # ==========================================================
+            #________________       Collision Detection     ________________
 
-            # Partiamo dal presupposto di essere in aria
+
             self._is_grounded = False
 
-            # 2.1 Controllo Pavimento (Se vuoi mantenere un pavimento di "base" oltre alle piattaforme)
-            floor_y = ah - 45  # Il tuo "pavimento" originale
+            # checking floor
+            floor_y = ah - 45 
             if self._y + self._h >= floor_y and self._dy >= 0:
                 self._y = floor_y - self._h
                 self._dy = 0
                 self._is_grounded = True
                 self._jump_anim = False # Siamo atterrati
 
-            # 2.2 Controllo Piattaforme (La logica a 4 lati di Mario)
+            # checking platforms
             for other in arena.collisions():
                 if isinstance(other, Platform):
                     plat_x, plat_y = other.pos()
                     plat_w, plat_h = other.size()
 
-                    # 1. Atterraggio ⤓ (Stiamo cadendo e siamo sopra la piattaforma)
+                    # 1. down ⤓ 
                     if self._y < plat_y and self._dy >= 0:
-                        self._y = plat_y - self._h  # Atterrato
+                        self._y = plat_y - self._h  
                         self._dy = 0
                         self._is_grounded = True
-                        self._jump_anim = False # Siamo atterrati
+                        self._jump_anim = False 
                     
-                    # 2. Testa sbattuta ⤒ (Stiamo salendo e siamo sotto la piattaforma)
+                    # 2. up ⤒ 
                     elif self._y + self._h > plat_y + plat_h and self._dy <= 0:
                         self._y = plat_y + plat_h + 1
                         self._dy = 0
                     
-                    # 3. Scontro a sinistra ⇥ (Andiamo a dx e colpiamo il lato sx)
+                    # 3. left ⇥ 
                     elif self._x < plat_x and self._dx >= 0:
                         self._x = plat_x - self._w
-                        self._dx = 0 # Blocca movimento orizzontale
+                        self._dx = 0 # Block movement
                     
-                    # 4. Scontro a destra ⇤ (Andiamo a sx e colpiamo il lato dx)
+                    # 4.right ⇤ 
                     elif self._x + self._w > plat_x + plat_w and self._dx <= 0:
                         self._x = plat_x + plat_w
-                        self._dx = 0 # Blocca movimento orizzontale
+                        self._dx = 0 # Block movement
 
-            # 2.3 Gestione Salto (Controlla il tasto ORA che sappiamo se siamo a terra)
+            # 2.3 jumping control 
             if ("Spacebar" in keys or "w" in keys) and self._is_grounded:
-                self._dy = -self._djump  # Salta! (Usa la tua variabile _djump)
+                self._dy = -self._djump 
                 self._jump_anim = True
                 self._i_jump = None
                 
