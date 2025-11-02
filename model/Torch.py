@@ -1,5 +1,6 @@
 from actor import Actor, Arena, Point
 from random import choice, randint
+from model.Flame import Flame
 
 #___________        ANIMATIONS          ____________
 THROW_RIGHT = [
@@ -21,24 +22,43 @@ class Torch(Actor):
         self._x, self._y = pos
         self._w, self._h = 15, 14
         self._spawn = True 
-        self._speed = 10
+        self._speed = 3
         self._dx = dx*self._speed
         self._dy = 0
         self._direction = dx
+        #animation stats
         self._sprite_start, self._sprite_end = THROW_LEFT[0] if self._direction == 1 else THROW_RIGHT[0]
+        self._frame = 0
+        self._duration_frame = 4
 
     def move(self, arena:Arena):
-        G = 0.2
+        G = 0.3
         aw, ah = arena.size()
         ah -= 30
         if self._y == ah - self._h:
             self._dx = 0
-            # self.hit(self, arena)
+            self.hit(arena)
+            arena.spawn(Flame(self.pos()))
         self._dx
         self._x += self._dx
         self._y += G
         self._x = min(max(self._x, 5), aw - self._w)  # clamp
         self._y = min(max(self._y, 5), ah - self._h)  # clamp
+
+        #________________       Animation Zone     ________________
+
+        if self._direction == 1:
+            animation = THROW_RIGHT
+        else:
+            animation = THROW_LEFT
+        index = (self._frame//self._duration_frame)%(len(animation))
+        self._sprite_start, self._sprite_end = animation[index]
+
+        if self._frame >= 120:
+            self._frame = 0
+        else:
+            self._frame += 1
+
 
     def hit(self, arena: Arena):
         arena.kill(self)

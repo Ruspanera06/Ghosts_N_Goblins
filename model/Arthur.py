@@ -16,7 +16,7 @@ JUMP_RIGHT_ARMOR = [
 JUMP_LEFT_ARMOR = [
     ((304, 28), (332, 56)),
     ((335, 28), (368, 56))
-][::1]
+][::-1]
 
 JUMP_RIGHT_NAKED = [
     ((144, 61), (174, 88)),
@@ -54,6 +54,42 @@ RUNNING_RIGHT_NAKED = [
     ((109, 76), (134, 102))
 ]
 
+THROW_RIGHT_ARMOR = [
+    ((4,132), (27, 163)),
+    ((29,132), (53, 163))
+]
+
+THROW_LEFT_ARMOR = []
+
+for s in THROW_RIGHT_ARMOR:
+    s_x = (s[1][0]-s[0][0])
+    x = sprite_x - s[0][0] - s_x
+    y = s[0][1]
+    size_x = x + s_x
+    size_y = s[1][1]
+    THROW_LEFT_ARMOR.append(
+        ((x, y), (size_x, size_y))
+)
+    
+THROW_RIGHT_NAKED = [
+    ((6, 164), (26, 193)),
+    ((30, 164), (54, 193))
+]
+
+THROW_LEFT_NAKED = []
+
+for s in THROW_RIGHT_NAKED:
+    s_x = (s[1][0]-s[0][0])
+    x = sprite_x - s[0][0] - s_x
+    y = s[0][1]
+    size_x = x + s_x
+    size_y = s[1][1]
+    THROW_LEFT_NAKED.append(
+        ((x, y), (size_x, size_y))
+)
+
+    
+
 RUNNING_LEFT_NAKED = []
 #mirroring RUNNING_RIGHT_ARMOR so it become RUNNING_LEF_ARMOR
 for s in RUNNING_RIGHT_NAKED:
@@ -88,6 +124,8 @@ class Arthur(Actor):
         self._direction = 0 
         self._jump_anim = False
         self._i_jump = None
+        self._attack_animation = False
+        self._attack_duration = 5
         
         
 
@@ -112,6 +150,7 @@ class Arthur(Actor):
                 if self._attack_frame == self._attack_speed:
                     self.throw_Torch(arena)
                     self._attack_frame = 0
+                    self._attack_animation = True
             
             self._attack_frame = min(self._attack_frame+1, self._attack_speed)
 
@@ -185,45 +224,46 @@ class Arthur(Actor):
             # ==========================================================
             # 4. ANIMATION ZONE (Il tuo codice, invariato)
             # ==========================================================
-            
-            if self._frame >= 120:
-                self._frame = 0
-            else:
-                self._frame += 1
 
             #________________JUMP FRAME LOGIC________________
-            if self._jump_anim : # (Ho rinominato il tuo `self._jump` in `self._jump_anim`
-                                #  perché ha senso, ma puoi ri-cambiarlo se preferisci)
+            if self._attack_animation:
+                if self._attack_frame == self._attack_speed:
+                    self._attack_animation = False
+
+                if self._direction == 1 and self._health == 2:
+                    animation = THROW_LEFT_ARMOR.copy()
+                elif self._direction == 0 and self._health == 2:
+                    animation = THROW_RIGHT_ARMOR.copy()
+                elif self._direction == 1 and self._health == 1:
+                    animation = THROW_LEFT_NAKED.copy()
+                else:
+                    animation = THROW_RIGHT_NAKED.copy()
+                index = (self._frame//self._attack_duration)%(len(animation))
+                self._sprite_start, self._sprite_end = animation[index]
+            elif self._jump_anim :
                 if self._i_jump == None:
                     self._i_jump = randint(0,1)
                 if self._direction == 1 and self._health == 2:
                     self._sprite_start, self._sprite_end = JUMP_LEFT_ARMOR[self._i_jump]
-                # ... (TUTTA LA TUA LOGICA DI ANIMAZIONE RESTA QUI, IDENTICA) ...
                 elif self._direction == 0 and self._health == 2:
                     self._sprite_start, self._sprite_end = JUMP_RIGHT_ARMOR[self._i_jump]
                 elif self._direction == 1 and self._health == 1:
                     self._sprite_start, self._sprite_end = JUMP_LEFT_NAKED[self._i_jump]
                 else:
                     self._sprite_start, self._sprite_end = JUMP_RIGHT_NAKED[self._i_jump]
-            
-            #________________IDLE FRAME LOGIC________________
             elif self._dx == 0:
                 self._frame = 0
                 if self._direction == 1 and self._health == 2:
                     self._sprite_start, self._sprite_end = IDLE_LEFT_ARMOR
-                # ... (TUTTA LA TUA LOGICA DI ANIMAZIONE RESTA QUI, IDENTICA) ...
                 elif self._direction == 0 and self._health == 2:
                     self._sprite_start, self._sprite_end = IDLE_RIGHT_ARMOR
                 elif self._direction == 1 and self._health == 1:
                     self._sprite_start, self._sprite_end = IDLE_LEFT_NAKED
                 else:
                     self._sprite_start, self._sprite_end = IDLE_RIGHT_NAKED
-
-            #________________RUNNING FRAME LOGIC________________
             else:
                 if self._direction == 1 and self._health == 2:
                     animation = RUNNING_LEFT_ARMOR.copy()
-                # ... (TUTTA LA TUA LOGICA DI ANIMAZIONE RESTA QUI, IDENTICA) ...
                 elif self._direction == 1 and self._health == 1:  
                     animation = RUNNING_LEFT_NAKED.copy()
                 elif self._direction == 0 and self._health == 2:
@@ -233,6 +273,11 @@ class Arthur(Actor):
 
                 index = (self._frame//self._duration_frame)%(len(animation))
                 self._sprite_start, self._sprite_end = animation[index]
+            
+            if self._frame >= 120:
+                self._frame = 0
+            else:
+                self._frame += 1
             
     def throw_Torch(self, arena: Arena):
         y = self.pos()[1] + 2
