@@ -217,8 +217,9 @@ class Arthur(Actor):
                         x, y = other.pos()
                         x_end, y_end = other.end()
                         if (x <= self._x <= x_end) or (x <= self.end()[0] <= x_end):
-                            self._x = x - self.size()[0]/2
                             self._ladder = other
+                            ladder_x_size = abs(x-x_end)/2
+                            self._x = x + ladder_x_size - self.size()[0]/2 -4
                             break
             # 2.3 jumping control 
             if ("Spacebar" in keys or "w" in keys) and self._is_grounded:
@@ -229,8 +230,8 @@ class Arthur(Actor):
                         if (x <= self._x <= x_end) or (x <= self.end()[0] <= x_end):
                             self._ladder = other
                             self._y -= 20
-                            ladder_x_size = abs(x-x_end)
-                            self._x = x + ladder_x_size - self.size()[0]/2
+                            ladder_x_size = abs(x-x_end)/2
+                            self._x = x + ladder_x_size - self.size()[0]/2 -4
                             break
                 if self._ladder == None:
                     self._dy = -self._djump
