@@ -25,7 +25,7 @@ class Eyeball(Actor):
                 w, h = other.size()
                 
                 #________________       Collision Detection     ________________
-                if (self._x >= x and self._x <= x+h) or  (x <= self._x + self._w <= x+h) :
+                if (self._x >= x and self._x <= x+h) or  (x <= self._x + self.size()[0] <= x+h) :
                     if  (y <= self._y <= y+h) or (y <= self._y + self.size()[1] <= y+h):
                         self.hit(arena)
                         other.hit(arena)
