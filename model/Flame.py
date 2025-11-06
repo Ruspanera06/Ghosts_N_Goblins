@@ -1,4 +1,6 @@
 from actor import Actor, Arena, Point
+from model.Zombie import Zombie
+from model.Plant import Plant
 
 #___________        ANIMATIONS          ____________
 
@@ -29,6 +31,10 @@ class Flame(Actor):
     
     def move(self, arena: Arena):
         ###########          ANIMATION ZONE      ################
+
+        for other in arena.collisions():
+            if isinstance(other, Zombie) or isinstance(other, Plant):
+                other.hit(arena)
 
         if self._frame <= 40:
             animation = DAMAGING_FLAME

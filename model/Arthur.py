@@ -3,6 +3,7 @@ from random import choice, randint
 from model.Torch import Torch
 from model.Platform import Platform 
 from model.Ladder import Ladder
+
 #animations sprites
 #the tuple will contain ((start_x, start_y), (end_x, end_y)) of the png
 IDLE_RIGHT_ARMOR = ((5, 42), (26, 73))
@@ -131,6 +132,9 @@ class Arthur(Actor):
         self._attack_speed = 10
         self._attack_frame = self._attack_speed
         self._ladder_speed = 2
+
+        self._grace = 30
+        self._grace_max = 30
         
         #animation stats
         self._sprite_start, self._sprite_end = IDLE_RIGHT_ARMOR
@@ -247,8 +251,7 @@ class Arthur(Actor):
             # 3. APPLICA FISICA E MOVIMENTO FINALE
             # ==========================================================
             
-            # Applica gravità
-            # if self._ladder == None:
+            # Apply gravity
             self._dy += G 
             if self._ladder != None:
                 self._frame = 0
@@ -269,14 +272,14 @@ class Arthur(Actor):
                     self._climb_frame = 0
                     self._top_ladder = False
             
-            # Applica movimento
+            # Moving
             self._x += self._dx
             self._y += self._dy
+            self._grace = min(self._grace + 1, self._grace_max)
 
-            # Clamp ai bordi dell'arena (Il tuo clamp per X, ma per Y solo in alto)
+            # Clamp at the border of the arena 
             self._x = min(max(self._x, 5), aw - self._w)
-            self._y = max(self._y, 5) # Clamp solo per il "cielo"
-                                    # Il fondo è gestito da 'floor_y' e dalle piattaforme
+            self._y = max(self._y, 5) # Clamp
 
 
             # ==========================================================
@@ -357,10 +360,6 @@ class Arthur(Actor):
     def throw_Torch(self, arena: Arena):
         y = self.pos()[1] + 2
         x = self.pos()[0] if self._direction == 1 else self.pos()[0] + self.size()[0]
-        # if self._direction == 1:
-        #     x = self.pos()[0]
-        # else:
-        #     x = self.pos()[0] + self.size()[0]
         direction = 0
         if self._direction == 1:
             direction = -1
@@ -369,12 +368,17 @@ class Arthur(Actor):
         arena.spawn(Torch((x, y), direction))
 
     def hit(self, arena: Arena):
-        self._health -= 1
+        # self._health -= 1
         if self._health <= 0:
             arena.kill(self)
+            
 
     def pos(self) -> Point:
         return self._x, self._y
+
+    def center(self) -> Point:
+        sx, sy = self.size()
+        return self._x + sx/2, self._y + sy/2
     
     def end(self) -> Point:
         x, y = self.pos()

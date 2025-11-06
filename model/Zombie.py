@@ -1,6 +1,6 @@
 from actor import Actor, Arena, Point
 from random import choice, randint
-from model.Flame import Flame
+# from model.Flame import Flame
 
 #ZOMBIE_RISE_RIGHTs=   
 # ===  (RISING FROM THE GROUND) === 
@@ -83,16 +83,16 @@ class Zombie(Actor):
                 self._dx = 0
 
         #________________       Collision Detection     ________________
-        for other in arena.collisions():
-                if isinstance(other, Flame):
-                    x, y = other.pos()
-                    w, h = other.size()
+        # for other in arena.collisions():
+        #         if isinstance(other, Flame):
+        #             x, y = other.pos()
+        #             w, h = other.size()
                     
-                    #cheching if the point if the left-side or right-side is contained into the zombies x
-                    if (self._x >= x and self._x <= x+h) or  (x <= self._x + self._w <= x+h) :
-                        #same check but with the y
-                        if  (y <= self._y <= y+h) or (y <= self._y + self._h <= y+h):
-                            self.hit(arena)
+        #             #cheching if the point if the left-side or right-side is contained into the zombies x
+        #             if (self._x >= x and self._x <= x+h) or  (x <= self._x + self._w <= x+h) :
+        #                 #same check but with the y
+        #                 if  (y <= self._y <= y+h) or (y <= self._y + self._h <= y+h):
+        #                     self.hit(arena)
 
 
         ###########          ANIMATION ZONE      ################

@@ -8,6 +8,7 @@ from model.Platform import Platform
 from model.Flame import Flame
 from model.Torch import Torch
 from model.Ladder import Ladder, LADDERS
+from model.Plant import Plant
 
 x_view,y_view = 2,10
 w_view, h_view = 400,239
@@ -76,6 +77,8 @@ def main():
         arena.spawn(Ladder(pos_start, pos_end))
     for pos_start, pos_end in BASE1:
         arena.spawn(Platform(pos_start, pos_end))
+    
+    arena.spawn(Plant((350, 100)))
     g2d.init_canvas((w_view-2,h_view-10),2)
     g2d.main_loop(tick)
 
