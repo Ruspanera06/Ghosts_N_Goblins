@@ -7,16 +7,22 @@ from model.Gravestone import Gravestone
 from model.Platform import Platform 
 from model.Flame import Flame
 from model.Torch import Torch
-import actor
+from model.Ladder import Ladder
+from model.Plant import Plant
 import json
+import actor
 class GngGame(actor.Arena):
     def __init__(self, size=(3585, 239), time = 120*30):
         super().__init__(size)
         with open("config.json") as f:
             data = json.load(f)
-        self.spawn(data["arthur"]["position"])
+        self.spawn(Arthur(data["arthur"]["position"]))
         for x in data["BASE1"]:
             self.spawn(Platform(tuple(x[0]), tuple(x[1])))
+        for x in data["ladders"]:
+            self.spawn(Ladder(tuple(x[0]), tuple(x[1])))
+        for x in data["plants"]:
+            self.spawn(Plant(tuple(x)))
         
         self._time = time
     
@@ -33,6 +39,9 @@ class GngGame(actor.Arena):
                     self.spawn(Zombie(z_pos, direction))
                     break
 
+    def tick(self, keys=...):
+        self.spawn_zombie()
+        return super().tick(keys)
 
     def game_over(self) -> bool:
         return self.lives() <= 0

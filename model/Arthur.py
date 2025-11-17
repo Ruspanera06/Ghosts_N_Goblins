@@ -304,8 +304,6 @@ class Arthur(Actor):
                     self._ladder = None
                 
             elif self._attack_animation:
-            #________________JUMP FRAME LOGIC________________
-            if self._attack_animation:
                 if self._attack_frame == self._attack_speed:
                     self._attack_animation = False
 
