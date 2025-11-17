@@ -7,6 +7,9 @@ from model.Gravestone import Gravestone
 from model.Platform import Platform 
 from model.Flame import Flame
 from model.Torch import Torch
+import json
+from GngGame import GngGame
+from GngGui import GngGui
 
 x_view,y_view = 2,10
 w_view, h_view = 400,239
@@ -14,15 +17,6 @@ initial_image_x = 2
 initial_image_y = 10
 end_image_x = 3585
 end_image_y = 239
-
-BASE1 =[
-    ((564,164),(593,154)),
-    ((583,141),(593,153)),
-    ((597,137),(1130,126)),
-    ((1159,170),(1182,175)),
-    ((1148,154),(1167,169)),
-    ((1130,139),(1151,153))
-]
 
 def tick():
     global initial_image_x, initial_image_y, end_image_x, end_image_y
@@ -64,13 +58,17 @@ def tick():
 
 
 def main():
+    with open("config.json") as f:
+        data = json.load(f)
     global w_view, h_view
     global g2d, arena
     import g2d  # game classes do not depend on g2d
-    arena = Arena((3585, h_view))
-    arena.spawn(Arthur((100, 150)))
+    arena_size = tuple(data["arena"]["size"])
+    arena = Arena(arena_size)
+    arthur_pos = tuple(data["arthur"]["position"])
+    arena.spawn(Arthur(arthur_pos))
 
-    for pos_start, pos_end in BASE1:
+    for pos_start, pos_end in data["BASE1"]:
         arena.spawn(Platform(pos_start, pos_end))
     g2d.init_canvas((w_view-2,h_view-10),2)
     g2d.main_loop(tick)

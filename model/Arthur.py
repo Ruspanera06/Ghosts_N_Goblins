@@ -199,10 +199,7 @@ class Arthur(Actor):
                 self._jump_anim = True
                 self._i_jump = None
                 
-            # ==========================================================
-            # 3. APPLICA FISICA E MOVIMENTO FINALE
-            # ==========================================================
-            
+
             # Applica gravità
             self._dy += G 
             
@@ -214,11 +211,6 @@ class Arthur(Actor):
             self._x = min(max(self._x, 5), aw - self._w)
             self._y = max(self._y, 5) # Clamp solo per il "cielo"
                                     # Il fondo è gestito da 'floor_y' e dalle piattaforme
-
-
-            # ==========================================================
-            # 4. ANIMATION ZONE (Il tuo codice, invariato)
-            # ==========================================================
 
             #________________JUMP FRAME LOGIC________________
             if self._attack_animation:
@@ -277,10 +269,6 @@ class Arthur(Actor):
     def throw_Torch(self, arena: Arena):
         y = self.pos()[1] + 2
         x = self.pos()[0] if self._direction == 1 else self.pos()[0] + self.size()[0]
-        # if self._direction == 1:
-        #     x = self.pos()[0]
-        # else:
-        #     x = self.pos()[0] + self.size()[0]
         direction = 0
         if self._direction == 1:
             direction = -1
@@ -292,6 +280,9 @@ class Arthur(Actor):
         self._health -= 1
         if self._health <= 0:
             arena.kill(self)
+    
+    def lives(self):
+        return self._health
 
     def pos(self) -> Point:
         return self._x, self._y

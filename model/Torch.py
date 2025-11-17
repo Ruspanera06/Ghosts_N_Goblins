@@ -34,7 +34,7 @@ class Torch(Actor):
 
     def move(self, arena:Arena):
         G = 0.3
-        G = 5
+        # G = 5
         aw, ah = arena.size()
         ah -= 30
         if self._y == ah - self._h:
