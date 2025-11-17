@@ -7,6 +7,8 @@ from model.Gravestone import Gravestone
 from model.Platform import Platform 
 from model.Flame import Flame
 from model.Torch import Torch
+from model.Ladder import Ladder, LADDERS
+from model.Plant import Plant
 import json
 from GngGame import GngGame
 from GngGui import GngGui
@@ -70,6 +72,8 @@ def main():
 
     for pos_start, pos_end in data["BASE1"]:
         arena.spawn(Platform(pos_start, pos_end))
+    
+    arena.spawn(Plant((350, 100)))
     g2d.init_canvas((w_view-2,h_view-10),2)
     g2d.main_loop(tick)
 

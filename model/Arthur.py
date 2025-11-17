@@ -2,6 +2,8 @@ from actor import Actor, Arena, Point
 from random import choice, randint
 from model.Torch import Torch
 from model.Platform import Platform 
+from model.Ladder import Ladder
+
 #animations sprites
 #the tuple will contain ((start_x, start_y), (end_x, end_y)) of the png
 IDLE_RIGHT_ARMOR = ((5, 42), (26, 73))
@@ -102,7 +104,20 @@ for s in RUNNING_RIGHT_NAKED:
         ((x, y), (size_x, size_y))
     )
 
+CLIMBING_LADDER_ARMOR = [
+    ((149, 132), (171, 162)),
+    ((340, 132), (361, 162))
+]
 
+CLIMBING_LADDER_NAKED = [
+    ((149, 163), (170, 193)),
+    ((341, 163), (362, 193))
+]
+
+TOP_LADDER_ARMOR = [
+    ((197, 131), (220, 157)),
+    ((223, 131), (246, 149)),
+]
 
 class Arthur(Actor):
     def __init__(self, pos):
@@ -116,16 +131,29 @@ class Arthur(Actor):
         self._health = 1
         self._attack_speed = 10
         self._attack_frame = self._attack_speed
+        self._ladder_speed = 2
+
+        self._grace = 30
+        self._grace_max = 30
         
         #animation stats
         self._sprite_start, self._sprite_end = IDLE_RIGHT_ARMOR
         self._frame = 0
-        self._duration_frame = 3
+        self._duration_frame = 2
         self._direction = 0 
         self._jump_anim = False
         self._i_jump = None
+
         self._attack_animation = False
         self._attack_duration = 5
+
+        self._ladder = None
+        self._climb_duration = 3
+        self._climb_frame = 0
+
+        self._top_ladder = False
+        #self._top_ladder_duration = 3
+
         
         
 
@@ -135,7 +163,6 @@ class Arthur(Actor):
             keys = arena.current_keys()
 
             #_________________        Input Control Zone        ________________
-
             self._dx = 0
             if "a" in keys:
                 self._dx -= self._speed
@@ -144,11 +171,6 @@ class Arthur(Actor):
                 self._direction = 0
                 self._dx += self._speed
             
-            if "f" in keys:
-                if self._attack_frame == self._attack_speed:
-                    self.throw_Torch(arena)
-                    self._attack_frame = 0
-                    self._attack_animation = True
             
             self._attack_frame = min(self._attack_frame+1, self._attack_speed)
 
@@ -172,14 +194,14 @@ class Arthur(Actor):
                     plat_w, plat_h = other.size()
 
                     # 1. down ⤓ 
-                    if self._y < plat_y and self._dy >= 0:
+                    if self._y < plat_y and self._dy >= 0 and self._ladder == None:
                         self._y = plat_y - self._h  
                         self._dy = 0
                         self._is_grounded = True
                         self._jump_anim = False 
                     
                     # 2. up ⤒ 
-                    elif self._y + self._h > plat_y + plat_h and self._dy <= 0:
+                    elif self._y + self._h > plat_y + plat_h and self._dy <= 0 and self._ladder == None:
                         self._y = plat_y + plat_h + 1
                         self._dy = 0
                     
@@ -193,25 +215,95 @@ class Arthur(Actor):
                         self._x = plat_x + plat_w
                         self._dx = 0 # Block movement
 
+            if ("s" in keys) and self._is_grounded:
+                for other in arena.collisions():
+                    if isinstance(other, Ladder):
+                        x, y = other.pos()
+                        x_end, y_end = other.end()
+                        if (x <= self._x <= x_end) or (x <= self.end()[0] <= x_end):
+                            self._ladder = other
+                            ladder_x_size = abs(x-x_end)/2
+                            self._x = x + ladder_x_size - self.size()[0]/2 -4
+                            break
             # 2.3 jumping control 
             if ("Spacebar" in keys or "w" in keys) and self._is_grounded:
-                self._dy = -self._djump 
-                self._jump_anim = True
-                self._i_jump = None
+                for other in arena.collisions():
+                    if isinstance(other, Ladder):
+                        x, y = other.pos()
+                        x_end, y_end = other.end()
+                        if (x <= self._x <= x_end) or (x <= self.end()[0] <= x_end):
+                            self._ladder = other
+                            self._y -= 20
+                            ladder_x_size = abs(x-x_end)/2
+                            self._x = x + ladder_x_size - self.size()[0]/2 -4
+                            break
+                if self._ladder == None:
+                    self._dy = -self._djump
+                    self._jump_anim = True
+                    self._i_jump = None
+            if "f" in keys and self._ladder == None:
+                if self._attack_frame == self._attack_speed:
+                    self.throw_Torch(arena)
+                    self._attack_frame = 0
+                    self._attack_animation = True
                 
+            # ==========================================================
+            # 3. APPLICA FISICA E MOVIMENTO FINALE
+            # ==========================================================
+            
+            # Apply gravity
 
             # Applica gravità
             self._dy += G 
+            if self._ladder != None:
+                self._frame = 0
+                self._dx = 0
+                if ("Spacebar" in keys or "w" in keys):
+                    self._dy = -self._ladder_speed
+                    self._climb_frame += 1
+                elif "s" in keys:
+                    self._dy = +self._ladder_speed
+                    self._climb_frame += 1
+                else:
+                    self._dy = 0
+
+                if self.end()[1] + self._dy <= self._ladder.pos()[1]:
+                    self._top_ladder = True
+                if self.end()[1] + self._dy >= floor_y:
+                    self._ladder = None
+                    self._climb_frame = 0
+                    self._top_ladder = False
             
-            # Applica movimento
+            # Moving
             self._x += self._dx
             self._y += self._dy
+            self._grace = min(self._grace + 1, self._grace_max)
 
-            # Clamp ai bordi dell'arena (Il tuo clamp per X, ma per Y solo in alto)
+            # Clamp at the border of the arena 
             self._x = min(max(self._x, 5), aw - self._w)
-            self._y = max(self._y, 5) # Clamp solo per il "cielo"
-                                    # Il fondo è gestito da 'floor_y' e dalle piattaforme
+            self._y = max(self._y, 5) # Clamp
 
+
+            # ==========================================================
+            # 4. ANIMATION ZONE (Il tuo codice, invariato)
+            # ==========================================================
+
+            if self._ladder != None:
+                if not self._top_ladder and self._health >= 2:
+                    animation = CLIMBING_LADDER_ARMOR.copy()
+                elif not self._top_ladder and self._health == 1:
+                    animation = CLIMBING_LADDER_NAKED.copy()
+                else:
+                    animation = TOP_LADDER_ARMOR.copy()
+                
+                index = (self._climb_frame//self._climb_duration)%(len(animation))
+                self._sprite_start, self._sprite_end = animation[index]
+
+                if self._top_ladder and index == 1:
+                    self._top_ladder = False
+                    self._ladder = None
+                
+            elif self._attack_animation:
             #________________JUMP FRAME LOGIC________________
             if self._attack_animation:
                 if self._attack_frame == self._attack_speed:
@@ -227,6 +319,7 @@ class Arthur(Actor):
                     animation = THROW_RIGHT_NAKED.copy()
                 index = (self._frame//self._attack_duration)%(len(animation))
                 self._sprite_start, self._sprite_end = animation[index]
+            #________________JUMP FRAME LOGIC________________
             elif self._jump_anim :
                 if self._i_jump == None:
                     self._i_jump = randint(0,1)
@@ -238,6 +331,7 @@ class Arthur(Actor):
                     self._sprite_start, self._sprite_end = JUMP_LEFT_NAKED[self._i_jump]
                 else:
                     self._sprite_start, self._sprite_end = JUMP_RIGHT_NAKED[self._i_jump]
+            #________________IDLE FRAME LOGIC________________
             elif self._dx == 0:
                 self._frame = 0
                 if self._direction == 1 and self._health == 2:
@@ -248,6 +342,7 @@ class Arthur(Actor):
                     self._sprite_start, self._sprite_end = IDLE_LEFT_NAKED
                 else:
                     self._sprite_start, self._sprite_end = IDLE_RIGHT_NAKED
+            #________________RUNNING FRAME LOGIC________________
             else:
                 if self._direction == 1 and self._health == 2:
                     animation = RUNNING_LEFT_ARMOR.copy()
@@ -277,15 +372,25 @@ class Arthur(Actor):
         arena.spawn(Torch((x, y), direction))
 
     def hit(self, arena: Arena):
-        self._health -= 1
+        # self._health -= 1
         if self._health <= 0:
             arena.kill(self)
+            
     
     def lives(self):
         return self._health
 
     def pos(self) -> Point:
         return self._x, self._y
+
+    def center(self) -> Point:
+        sx, sy = self.size()
+        return self._x + sx/2, self._y + sy/2
+    
+    def end(self) -> Point:
+        x, y = self.pos()
+        w, h = self.size()
+        return x+w, y+h
 
     def size(self) -> Point:
         iw, ih = self._sprite_start

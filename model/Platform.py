@@ -27,12 +27,10 @@ class Platform(Actor):
         pass 
     
     def size(self) -> Point:
-        # Restituisce sempre le dimensioni positive memorizzate
         return self._w, self._h
 
     # Il metodo pos_end() non è più necessario per la logica interna,
     # ma puoi tenerlo se ti serve per altri motivi.
 
     def sprite(self) -> Point:
-        # Giustissimo: restituisce None per essere invisibile
         return None
