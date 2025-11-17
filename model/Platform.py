@@ -12,25 +12,21 @@ class Platform(Actor):
         x1, y1 = pos
         x2, y2 = pos_end
         
-        # Calcola e memorizza l'angolo in alto a sinistra (min(x), min(y))
+        # calculating the angle top-left(min(x), min(y))
         self._x = min(x1, x2)
         self._y = min(y1, y2)
         
-        # Calcola e memorizza larghezza e altezza (sempre positive)
+        # calculating the width and height (min(x), min(y))
         self._w = abs(x1 - x2)
         self._h = abs(y1 - y2)
     
     def pos(self) -> Point:
-        # Restituisce sempre l'angolo in alto a sinistra memorizzato
         return self._x, self._y
     def move(self,arena):
         pass 
     
     def size(self) -> Point:
         return self._w, self._h
-
-    # Il metodo pos_end() non è più necessario per la logica interna,
-    # ma puoi tenerlo se ti serve per altri motivi.
 
     def sprite(self) -> Point:
         return None

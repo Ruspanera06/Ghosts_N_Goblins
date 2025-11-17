@@ -23,7 +23,7 @@ class GngGui():
             else:
                 pass
         
-        #check collisions
+        #check collisions of the view
     
         if "ArrowUp" in g2d.current_keys():
             self._y_view = max(self._y_view - 5, self._initial_image_y)

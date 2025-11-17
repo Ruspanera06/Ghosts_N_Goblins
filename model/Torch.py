@@ -53,7 +53,7 @@ class Torch(Actor):
                     x, y = other.pos()
                     w, h = other.size()
                     
-                    #cheching if the point if the left-side or right-side is contained into the zombies x
+                    #checking if the point if the left-side or right-side is contained into the zombies x
                     if (self._x >= x and self._x <= x+h) or  (x <= self._x + self._w <= x+h) :
                         #same check but with the y
                         if  (y <= self._y <= y+h) or (y <= self._y + self._h <= y+h):

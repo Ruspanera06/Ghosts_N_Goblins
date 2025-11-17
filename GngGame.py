@@ -14,6 +14,7 @@ import actor
 class GngGame(actor.Arena):
     def __init__(self, size=(3585, 239), time = 120*30):
         super().__init__(size)
+        # initializing the game
         with open("config.json") as f:
             data = json.load(f)
         self.spawn(Arthur(data["arthur"]["position"]))

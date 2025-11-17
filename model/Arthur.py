@@ -152,7 +152,6 @@ class Arthur(Actor):
         self._climb_frame = 0
 
         self._top_ladder = False
-        #self._top_ladder_duration = 3
 
         
         
@@ -185,7 +184,7 @@ class Arthur(Actor):
                 self._y = floor_y - self._h
                 self._dy = 0
                 self._is_grounded = True
-                self._jump_anim = False # Siamo atterrati
+                self._jump_anim = False # get if we hit the ground
 
             # checking platforms
             for other in arena.collisions():
@@ -247,13 +246,9 @@ class Arthur(Actor):
                     self._attack_frame = 0
                     self._attack_animation = True
                 
-            # ==========================================================
-            # 3. APPLICA FISICA E MOVIMENTO FINALE
-            # ==========================================================
+            #  Apply physics and movement
             
             # Apply gravity
-
-            # Applica gravità
             self._dy += G 
             if self._ladder != None:
                 self._frame = 0
@@ -284,9 +279,7 @@ class Arthur(Actor):
             self._y = max(self._y, 5) # Clamp
 
 
-            # ==========================================================
-            # 4. ANIMATION ZONE (Il tuo codice, invariato)
-            # ==========================================================
+            #           ANIMATION ZONE 
 
             if self._ladder != None:
                 if not self._top_ladder and self._health >= 2:
@@ -399,3 +392,23 @@ class Arthur(Actor):
 
     def sprite(self) -> Point:
         return self._sprite_start
+
+def main():
+    print(f"{JUMP_RIGHT_ARMOR=}")
+    print(f"{JUMP_LEFT_ARMOR=}")
+    print(f"{JUMP_RIGHT_NAKED=}")
+    print(f"{JUMP_LEFT_NAKED=}")
+    print(f"{RUNNING_RIGHT_ARMOR=}")
+    print(f"{RUNNING_LEFT_ARMOR=}")
+    print(f"{RUNNING_RIGHT_NAKED=}")
+    print(f"{THROW_RIGHT_ARMOR=}")
+    print(f"{THROW_LEFT_ARMOR=}")
+    print(f"{THROW_RIGHT_NAKED=}")
+    print(f"{THROW_LEFT_NAKED=}")
+    print(f"{RUNNING_LEFT_NAKED=}")
+    print(f"{CLIMBING_LADDER_ARMOR=}")
+    print(f"{CLIMBING_LADDER_NAKED=}")
+    print(f"{TOP_LADDER_ARMOR=}")
+
+if __name__ == "__main__":
+    main

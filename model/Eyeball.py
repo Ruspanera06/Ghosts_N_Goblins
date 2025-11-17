@@ -30,7 +30,7 @@ class Eyeball(Actor):
                         self.hit(arena)
                         other.hit(arena)
 
-        # remove Eyeball when hitting the borders
+        # remove Eyeball when out of the borders
         if (self._y + self.size()[1]  < 0) or (self._y > ah) or (self._x + self.size()[0] < 0) or (abs(self._orig_x - self._x) >= 500):
             self.hit(arena)
 

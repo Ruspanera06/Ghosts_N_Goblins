@@ -1,6 +1,5 @@
 from actor import Actor, Arena, Point
 from random import choice, randint
-# from model.Flame import Flame
 
 #ZOMBIE_RISE_RIGHTs=   
 # ===  (RISING FROM THE GROUND) === 
@@ -54,16 +53,15 @@ class Zombie(Actor):
         self._dy = 0
         self._direction = dx
 
-        # self._facing_right = True
         self._moving = True
-        self._distance_walkable = randint(150,300) #distanze che può percorrere
+        self._distance_walkable = randint(150,300) #distance it is gonna do
         self._distance_walked = 0
 
 
         #animation stats
         self._frame = 0
         self._duration_frame = 3
-        self._sprite_start, self._sprite_end = ZOMBIE_RISE_RIGHT[0]  #inizia con lo sprite di uscita
+        self._sprite_start, self._sprite_end = ZOMBIE_RISE_RIGHT[0]  #start with the exit sprite
         self._spawn_frame = 10
 
 
@@ -81,19 +79,6 @@ class Zombie(Actor):
                 self._moving  = False
                 self._spawn = True
                 self._dx = 0
-
-        #________________       Collision Detection     ________________
-        # for other in arena.collisions():
-        #         if isinstance(other, Flame):
-        #             x, y = other.pos()
-        #             w, h = other.size()
-                    
-        #             #cheching if the point if the left-side or right-side is contained into the zombies x
-        #             if (self._x >= x and self._x <= x+h) or  (x <= self._x + self._w <= x+h) :
-        #                 #same check but with the y
-        #                 if  (y <= self._y <= y+h) or (y <= self._y + self._h <= y+h):
-        #                     self.hit(arena)
-
 
         ###########          ANIMATION ZONE      ################
 
@@ -151,3 +136,12 @@ class Zombie(Actor):
 
     def sprite(self) -> Point:
         return self._sprite_start
+
+def main():
+    print(f"{ZOMBIE_RISE_LEFT=}")
+    print(f"{ZOMBIE_RISE_RIGHT=}")
+    print(f"{ZOMBIE_WALK_LEFT=}")
+    print(f"{ZOMBIE_WALK_RIGHT=}")
+
+if __name__ == "__main__":
+    main()
