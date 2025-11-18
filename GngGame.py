@@ -26,6 +26,7 @@ class GngGame(actor.Arena):
             self.spawn(Plant(tuple(x)))
         
         self._time = time
+        self._score = 0
     
     def spawn_zombie(self):
         n = randrange(150)
@@ -56,6 +57,12 @@ class GngGame(actor.Arena):
             if isinstance(a, Arthur):
                 return a.lives()
         return 0
+
+    def score(self) -> int:
+        return self._score
+
+    def add_score(self, points: int):
+        self._score += points
 
     def time(self) -> int:
         return self._time - self.count()

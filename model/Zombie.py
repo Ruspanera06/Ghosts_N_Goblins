@@ -57,6 +57,8 @@ class Zombie(Actor):
         self._distance_walkable = randint(150,300) #distance it is gonna do
         self._distance_walked = 0
 
+        self._points = 100
+
 
         #animation stats
         self._frame = 0
@@ -122,6 +124,7 @@ class Zombie(Actor):
         self._y = min(max(self._y, 0), ah - self._h)  # clamp
 
     def hit(self, arena: Arena):
+        arena.add_score(self._points)
         arena.kill(self)
 
     def pos(self) -> Point:

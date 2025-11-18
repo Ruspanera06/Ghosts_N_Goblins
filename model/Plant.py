@@ -25,6 +25,7 @@ class Plant(Actor):
         self._bullet_speed = 3
         self._direction = -1
         self._shoot = False
+        self._points = 200
         self._sprite_start, self._sprite_end = IDDLE_ANIMATION_LEFT[0]
 
     def move(self, arena: Arena):
@@ -39,6 +40,7 @@ class Plant(Actor):
         
 
     def hit(self, arena: Arena):
+        arena.add_score(self._points)
         arena.kill(self)
 
     def pos(self) -> Point:

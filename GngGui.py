@@ -1,5 +1,6 @@
 import g2d
 from GngGame import GngGame
+import json
 class GngGui():
     def __init__(self, viewport_size=(400-2, 239-10)):
         self._x_view,self._y_view = 2,10
@@ -10,6 +11,16 @@ class GngGui():
         self._end_image_y = 239
         self._game = GngGame()
         self.viewport_size = viewport_size
+
+        with open("config.json") as f:
+            data = json.load(f)
+        #loading position of the number of the sprite
+        self._numbers = [tuple(x) for x in data["numbers"]]
+        self._time_text = tuple(data["time_text"])
+        self._player1_text = tuple(data["player1_text"])
+        self._top_score_text = tuple(data["top_score_text"])
+        self._top_score = int(data["top_score"])
+
         g2d.init_canvas(self.viewport_size, 2)
         g2d.main_loop(self.tick)
     
@@ -36,14 +47,51 @@ class GngGui():
             self._x_view = max(self._x_view - 5, self._initial_image_x)
 
         lives, time = self._game.lives(), self._game.time() // 30
-        g2d.draw_text(f"Lives: {lives} Time: {time}", (250, 12), 24)
+        # g2d.draw_text(f"Lives: {lives} Time: {time}", (250, 12), 24)
+        g2d.draw_image("./assets/sprites/ghosts-goblins.png", (20, 3), self._player1_text[0], self._player1_text[1])
+        for i,x in enumerate(self.number_to_font_img(self._game.score())):
+            g2d.draw_image("./assets/sprites/ghosts-goblins.png", (20+i*8, 12), x[0], x[1])
+        
+        g2d.draw_image("./assets/sprites/ghosts-goblins.png", (80, 3), self._top_score_text[0], self._top_score_text[1])
+        for i,x in enumerate(self.number_to_font_img(self._top_score)):
+            g2d.draw_image("./assets/sprites/ghosts-goblins.png", (80+i*8, 12), x[0], x[1])
+
+        g2d.draw_image("./assets/sprites/ghosts-goblins.png", (20, 25), self._time_text[0], self._time_text[1])
+        for i,x in enumerate(self.number_to_font_img(time)):
+            g2d.draw_image("./assets/sprites/ghosts-goblins.png", (20+i*8, 34), x[0], x[1])
+        
+        
 
         if self._game.game_over():
+            self.save_top_score()
             g2d.alert("Game over")
             g2d.close_canvas()
         elif self._game.game_won():
+            self.save_top_score()
             g2d.alert("Game won")
             g2d.close_canvas()
         else:
             self._game.tick(g2d.current_keys())
+    
+    def save_top_score(self):
+        with open("config.json", "r") as f:
+            data = json.load(f)
+            data["top_score"] = self._game.score() if self._game.score() > self._top_score else self._top_score
+        with open("config.json", "w") as f:
+            json.dump(data, f, indent=4)
+
+    def number_to_font_img(self, num: int) -> tuple:
+        ### return the start position of the sprite and the size
+        converted = []
+        for v in str(num):
+            tmp = []
+            tmp.append(self._numbers[int(v)][0])
+            tmp.append(self._numbers[int(v)][1])
+            converted.append(tuple(tmp))
+        return converted
+
+    def score_to_font_img(self, num: int) -> tuple:
+        num = min(9999, num)
+        num = "0"*(4-len(str(num)))+str(num)
+        return self.number_to_font_img(num)
 

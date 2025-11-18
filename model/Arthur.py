@@ -363,7 +363,8 @@ class Arthur(Actor):
         arena.spawn(Torch((x, y), direction))
 
     def hit(self, arena: Arena):
-        # self._health -= 1
+        #uncomment the line below to activate the immortality for testing
+        self._health -= 1
         if self._health <= 0:
             arena.kill(self)
             
