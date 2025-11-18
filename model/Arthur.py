@@ -123,7 +123,6 @@ TOP_LADDER_ARMOR = [
 class Arthur(Actor):
     def __init__(self, pos):
         self._x, self._y = pos
-        self._w, self._h = 20, 20
         self._dx, self._dy = 0, 0
         self._jump = False
         self.max_jump = 40
@@ -144,6 +143,8 @@ class Arthur(Actor):
         self._direction = 0 
         self._jump_anim = False
         self._i_jump = None
+
+        self._w, self._h = self.size()
 
         self._attack_animation = False
         self._attack_duration = 5
@@ -259,11 +260,11 @@ class Arthur(Actor):
                         if  ((y <= self._y <= y+h) or (y <= self._y + self.size()[1] <= y+h)) and self._grace == self._grace_max:
                             self.hit(arena)
                             other.hit(arena)
-                            self._grace = 0
+                            # self._grace = 0
             #  Apply physics and movement
             
             # Apply gravity
-            self._dy += G 
+
             if self._ladder != None:
                 self._frame = 0
                 self._dx = 0
@@ -284,6 +285,7 @@ class Arthur(Actor):
                     self._top_ladder = False
             
             # Moving
+            self._dy += G 
             self._x += self._dx
             self._y += self._dy
             self._grace = min(self._grace + 1, self._grace_max)
@@ -384,6 +386,7 @@ class Arthur(Actor):
 
     def hit(self, arena: Arena):
         #uncomment the line below to activate the immortality for testing
+        self._grace = 0
         self._health -= 1
         if self._health <= 0:
             arena.kill(self)
