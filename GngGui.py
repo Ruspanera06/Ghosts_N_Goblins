@@ -49,12 +49,12 @@ class GngGui():
         lives, time = self._game.lives(), self._game.time() // 30
         # g2d.draw_text(f"Lives: {lives} Time: {time}", (250, 12), 24)
         g2d.draw_image("./assets/sprites/ghosts-goblins.png", (20, 3), self._player1_text[0], self._player1_text[1])
-        for i,x in enumerate(self.number_to_font_img(self._game.score())):
+        for i,x in enumerate(self.score_to_font_img(self._game.score())):
             g2d.draw_image("./assets/sprites/ghosts-goblins.png", (20+i*8, 12), x[0], x[1])
         
-        g2d.draw_image("./assets/sprites/ghosts-goblins.png", (80, 3), self._top_score_text[0], self._top_score_text[1])
-        for i,x in enumerate(self.number_to_font_img(self._top_score)):
-            g2d.draw_image("./assets/sprites/ghosts-goblins.png", (80+i*8, 12), x[0], x[1])
+        g2d.draw_image("./assets/sprites/ghosts-goblins.png", (100, 3), self._top_score_text[0], self._top_score_text[1])
+        for i,x in enumerate(self.score_to_font_img(self._top_score)):
+            g2d.draw_image("./assets/sprites/ghosts-goblins.png", (100+i*8, 12), x[0], x[1])
 
         g2d.draw_image("./assets/sprites/ghosts-goblins.png", (20, 25), self._time_text[0], self._time_text[1])
         for i,x in enumerate(self.number_to_font_img(time)):
@@ -78,7 +78,7 @@ class GngGui():
             data = json.load(f)
             data["top_score"] = self._game.score() if self._game.score() > self._top_score else self._top_score
         with open("config.json", "w") as f:
-            json.dump(data, f, indent=4)
+            json.dump(data, f, indent=4, separators=(", ", ": "))
 
     def number_to_font_img(self, num: int) -> tuple:
         ### return the start position of the sprite and the size
