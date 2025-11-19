@@ -3,6 +3,7 @@ from random import choice, randint
 from model.Torch import Torch
 from model.Platform import Platform 
 from model.Ladder import Ladder
+from model.Gravestone import Gravestone
 
 #animations sprites
 #the tuple will contain ((start_x, start_y), (end_x, end_y)) of the png
@@ -188,7 +189,7 @@ class Arthur(Actor):
 
             # checking platforms
             for other in arena.collisions():
-                if isinstance(other, Platform):
+                if isinstance(other, (Platform,Gravestone)):
                     plat_x, plat_y = other.pos()
                     plat_w, plat_h = other.size()
 

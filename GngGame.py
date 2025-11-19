@@ -11,6 +11,7 @@ from model.Ladder import Ladder
 from model.Plant import Plant
 import json
 import actor
+
 class GngGame(actor.Arena):
     def __init__(self, size=(3585, 239), time = 120*30):
         super().__init__(size)
@@ -20,6 +21,8 @@ class GngGame(actor.Arena):
         self.spawn(Arthur(data["arthur"]["position"]))
         for x in data["BASE1"]:
             self.spawn(Platform(tuple(x[0]), tuple(x[1])))
+        for x in data["gravestone"]:
+            self.spawn(Gravestone(tuple(x)))
         for x in data["ladders"]:
             self.spawn(Ladder(tuple(x[0]), tuple(x[1])))
         for x in data["plants"]:
