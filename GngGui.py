@@ -1,6 +1,8 @@
 import g2d
 from GngGame import GngGame
 import json
+from model.SnowFlake import SnowFlake
+from random import randint
 class GngGui():
     def __init__(self, viewport_size=(400-2, 239-10)):
         self._x_view,self._y_view = 2,10
@@ -9,8 +11,16 @@ class GngGui():
         self._initial_image_y = 10
         self._end_image_x = 3585
         self._end_image_y = 239
-        self._game = GngGame()
         self.viewport_size = viewport_size
+        
+
+        self._prev_keys = set()
+        self._key_buffer = ""
+        self._snow = False
+        self._max_snow_duration = 6*60
+        self._snow_duration = self._max_snow_duration
+        self._game = GngGame()
+
 
         with open("config.json") as f:
             data = json.load(f)
@@ -21,16 +31,43 @@ class GngGui():
         self._top_score_text = tuple(data["top_score_text"])
         self._top_score = int(data["top_score"])
 
+        
         g2d.init_canvas(self.viewport_size, 2)
         g2d.main_loop(self.tick)
     
     def tick(self):
         g2d.clear_canvas()
+        keys = g2d.current_keys()
+        #get the word just once since the tick goes too fast
+        pressed_now = set(keys) - set(self._prev_keys)
+        # catch if the player write "snow"
+        for k in pressed_now:
+            if len(k) == 1 and k.isalpha():
+                self._key_buffer += k.lower()
+                self._key_buffer = self._key_buffer[-4:]
+
+        self._prev_keys = keys
+        if self._key_buffer == "snow":
+            #reset the buffer
+            self._prev_keys = set()
+            self._snow = True
+            self._snow_duration = 0
+        
+        self._snow_duration = min(self._snow_duration+1, self._max_snow_duration)
+        if self._snow and not(self._snow_duration == self._max_snow_duration):
+            self.snowing()
+        
+
         g2d.draw_image("./assets/sprites/ghosts-goblins-bg.png", (-self._initial_image_x,-self._initial_image_y),(self._x_view, self._y_view),(self._w_view,self._h_view) )
         for a in self._game.actors():
             if a.sprite() != None:
                 x, y = a.pos()
-                g2d.draw_image("./assets/sprites/ghosts-goblins.png", (x - self._x_view, y - self._y_view), a.sprite(), a.size())
+                image = "./assets/sprites/ghosts-goblins.png"
+                if isinstance(a, SnowFlake):
+                    image = "./assets/sprites/snowflakes.png"
+                    g2d.draw_image(image, (x - self._x_view, y - self._y_view), a.sprite(), a.size())
+                else:
+                    g2d.draw_image(image, (x - self._x_view, y - self._y_view), a.sprite(), a.size())
             else:
                 pass
         
@@ -72,6 +109,15 @@ class GngGui():
             g2d.close_canvas()
         else:
             self._game.tick(g2d.current_keys())
+    
+    def snowing(self):
+        s = randint(0, 20)
+        if s == 0:
+            n = randint(0, 25)
+            for i in range(n):
+                x = randint(self._x_view, self._x_view+self._w_view)
+                y = -20
+                self._game.spawn(SnowFlake((x, y)))
     
     def save_top_score(self):
         with open("config.json", "r") as f:

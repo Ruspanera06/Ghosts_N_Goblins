@@ -234,7 +234,7 @@ class Arthur(Actor):
                         x_end, y_end = other.end()
                         if (x <= self._x <= x_end) or (x <= self.end()[0] <= x_end):
                             self._ladder = other
-                            self._y -= 20
+                            self._y -= 2
                             ladder_x_size = abs(x-x_end)/2
                             self._x = x + ladder_x_size - self.size()[0]/2 -4
                             break
@@ -265,8 +265,9 @@ class Arthur(Actor):
             
             # Apply gravity
 
+            self._dy += G 
             if self._ladder != None:
-                self._frame = 0
+                # self._frame = 0
                 self._dx = 0
                 if ("Spacebar" in keys or "w" in keys):
                     self._dy = -self._ladder_speed
@@ -285,7 +286,6 @@ class Arthur(Actor):
                     self._top_ladder = False
             
             # Moving
-            self._dy += G 
             self._x += self._dx
             self._y += self._dy
             self._grace = min(self._grace + 1, self._grace_max)
@@ -365,6 +365,7 @@ class Arthur(Actor):
                 index = (self._frame//self._duration_frame)%(len(animation))
                 self._sprite_start, self._sprite_end = animation[index]
 
+
             if (not self.check_grace()) and self._frame%6 == 0:
                     #casual coordinate of the png where there's nothing
                     self._sprite_start, self._sprite_end = (-38, 42), (-16, 74)
@@ -414,7 +415,6 @@ class Arthur(Actor):
         return x+w, y+h
 
     def size(self) -> Point:
-
         iw, ih = self._sprite_start
         ew, eh = self._sprite_end
         dw = ew-iw
