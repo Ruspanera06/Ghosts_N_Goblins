@@ -28,7 +28,7 @@ class Eyeball(Actor):
                 if (self._x >= x and self._x <= x+h) or  (x <= self._x + self.size()[0] <= x+h) :
                     if  ((y <= self._y <= y+h) or (y <= self._y + self.size()[1] <= y+h)) and other.check_grace():
                         self.hit(arena)
-                        other.reset_grace()
+                        # other.reset_grace()
                         other.hit(arena)
 
         # remove Eyeball when out of the borders
