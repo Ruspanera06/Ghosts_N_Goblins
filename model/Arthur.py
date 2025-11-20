@@ -195,8 +195,6 @@ class Arthur(Actor):
                     plat_x, plat_y = other.pos()
                     plat_w, plat_h = other.size()
                     if self._y + self._h > plat_y and self._dy and not(plat_y<=self._y <= plat_y+plat_h) > 0 and self._ladder == None:
-                        # print(other.pos(), self._y+self._h)
-                        print(plat_y + plat_h, self._y)
                         self._y = plat_y - self._h
                         self._dy = 0
                         self._is_grounded = True
