@@ -202,7 +202,6 @@ class Arthur(Actor):
                     
                     # 2. up ⤒ 
                     elif (plat_y<=self._y <= plat_y+plat_h) and self._dy < 0 and self._ladder == None:
-                        print(plat_y + plat_h, self._y)
                         self._y = plat_y + plat_h + 1
                         self._dy = 0
                     
