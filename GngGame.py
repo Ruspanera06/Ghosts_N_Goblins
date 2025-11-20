@@ -23,7 +23,7 @@ class GngGame(actor.Arena):
         for x in data["BASE1"]:
             self.spawn(Platform(tuple(x[0]), tuple(x[1])))
         for x in data["gravestone"]:
-            self.spawn(Gravestone(tuple(x)))
+            self.spawn(Gravestone(tuple(x[0]), tuple(x[1])))
         for x in data["ladders"]:
             self.spawn(Ladder(tuple(x[0]), tuple(x[1])))
         for x in data["plants"]:

@@ -2,6 +2,7 @@ import g2d
 from GngGame import GngGame
 import json
 from model.SnowFlake import SnowFlake
+from model.Zombie import Zombie
 from random import randint
 class GngGui():
     def __init__(self, viewport_size=(400-2, 239-10)):
@@ -65,10 +66,12 @@ class GngGui():
                 image = "./assets/sprites/ghosts-goblins.png"
                 if isinstance(a, SnowFlake):
                     image = "./assets/sprites/snowflakes.png"
-                    g2d.draw_image(image, (x - self._x_view, y - self._y_view), a.sprite(), a.size())
-                else:
-                    g2d.draw_image(image, (x - self._x_view, y - self._y_view), a.sprite(), a.size())
-                g2d.draw_image("./assets/sprites/ghosts-goblins-babbinatale.png", (x - self._x_view, y - self._y_view), a.sprite(), a.size())
+                    # g2d.draw_image(image, (x - self._x_view, y - self._y_view), a.sprite(), a.size())
+                elif isinstance(a, Zombie):
+                    image = "./assets/sprites/ghosts-goblins-babbinatale.png"
+                    # g2d.draw_image("./assets/sprites/ghosts-goblins-babbinatale.png", (x - self._x_view, y - self._y_view), a.sprite(), a.size())
+
+                g2d.draw_image(image, (x - self._x_view, y - self._y_view), a.sprite(), a.size())
             else:
                 pass
         

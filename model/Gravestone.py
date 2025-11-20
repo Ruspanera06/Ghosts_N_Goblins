@@ -18,9 +18,12 @@ POSS = [
 ]
 
 class Gravestone(Actor):
-    def __init__(self, pos):
+    def __init__(self, pos, end):
         self._x, self._y = pos
-        self._w, self._h = GRAVESTONE_SPRITE_SIZE
+        # self._w, self._h = GRAVESTONE_SPRITE_SIZE
+        end_x, end_y = end
+
+        self._w, self._h = abs(self._x - end_x), abs(self._y - end_y)
     
     def pos(self) -> Point:
         return self._x, self._y

@@ -196,24 +196,24 @@ class Arthur(Actor):
                     plat_w, plat_h = other.size()
 
                     # 1. down ⤓ 
-                    if self._y < plat_y and self._dy >= 0 and self._ladder == None:
+                    if self._y < plat_y and self._dy >= 0  and self._ladder == None:
                         self._y = plat_y - self._h  
                         self._dy = 0
                         self._is_grounded = True
-                        self._jump_anim = False 
+                        self._jump_anim = False
                     
                     # 2. up ⤒ 
-                    elif self._y + self._h > plat_y + plat_h and self._dy <= 0 and self._ladder == None:
+                    elif self._y > plat_y + plat_h and self._dy <= 0 and self._ladder == None:
                         self._y = plat_y + plat_h + 1
                         self._dy = 0
                     
                     # 3. left ⇥ 
-                    elif self._x < plat_x and self._dx >= 0:
+                    elif self._x < plat_x and self._dx >= 0 and self._ladder == None:
                         self._x = plat_x - self._w
                         self._dx = 0 # Block movement
                     
                     # 4.right ⇤ 
-                    elif self._x + self._w > plat_x + plat_w and self._dx <= 0:
+                    elif self._x + self._dx < plat_x + plat_w and self._dx <= 0 and self._ladder == None:
                         self._x = plat_x + plat_w
                         self._dx = 0 # Block movement
 
@@ -387,9 +387,9 @@ class Arthur(Actor):
         arena.spawn(Torch((x, y), direction))
 
     def hit(self, arena: Arena):
-        #uncomment the line below to activate the immortality for testing
-        self._grace = 0
-        self._health -= 1
+        #comment the line below to activate the immortality for testing
+        # self._grace = 0
+        # self._health -= 1
         if self._health <= 0:
             arena.kill(self)
             
