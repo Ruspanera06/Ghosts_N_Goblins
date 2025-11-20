@@ -3,6 +3,7 @@ from random import choice, randint
 from model.Torch import Torch
 from model.Platform import Platform 
 from model.Ladder import Ladder
+from model.Zombie import Zombie
 from model.Gravestone import Gravestone
 
 #animations sprites
@@ -123,19 +124,18 @@ TOP_LADDER_ARMOR = [
 class Arthur(Actor):
     def __init__(self, pos):
         self._x, self._y = pos
-        self._w, self._h = 20, 20
         self._dx, self._dy = 0, 0
         self._jump = False
         self.max_jump = 40
         self._djump = 15
         self._speed = 3
-        self._health = 1
+        self._health = 2
         self._attack_speed = 10
         self._attack_frame = self._attack_speed
         self._ladder_speed = 2
 
-        self._grace = 30
-        self._grace_max = 30
+        self._grace_max = 3 * 60
+        self._grace = self._grace_max
         
         #animation stats
         self._sprite_start, self._sprite_end = IDLE_RIGHT_ARMOR
@@ -144,6 +144,8 @@ class Arthur(Actor):
         self._direction = 0 
         self._jump_anim = False
         self._i_jump = None
+
+        self._w, self._h = self.size()
 
         self._attack_animation = False
         self._attack_duration = 5
@@ -233,7 +235,7 @@ class Arthur(Actor):
                         x_end, y_end = other.end()
                         if (x <= self._x <= x_end) or (x <= self.end()[0] <= x_end):
                             self._ladder = other
-                            self._y -= 20
+                            self._y -= 2
                             ladder_x_size = abs(x-x_end)/2
                             self._x = x + ladder_x_size - self.size()[0]/2 -4
                             break
@@ -247,12 +249,26 @@ class Arthur(Actor):
                     self._attack_frame = 0
                     self._attack_animation = True
                 
+
+            # collisions with zombies
+            for other in arena.collisions():
+                if isinstance(other, Zombie):
+                    x, y = other.pos()
+                    w, h = other.size()
+                    
+                    #________________       Collision Detection     ________________
+                    if (self._x >= x and self._x <= x+h) or  (x <= self._x + self.size()[0] <= x+h) :
+                        if  ((y <= self._y <= y+h) or (y <= self._y + self.size()[1] <= y+h)) and self._grace == self._grace_max:
+                            self.hit(arena)
+                            other.hit(arena)
+                            # self._grace = 0
             #  Apply physics and movement
             
             # Apply gravity
+
             self._dy += G 
             if self._ladder != None:
-                self._frame = 0
+                # self._frame = 0
                 self._dx = 0
                 if ("Spacebar" in keys or "w" in keys):
                     self._dy = -self._ladder_speed
@@ -278,6 +294,7 @@ class Arthur(Actor):
             # Clamp at the border of the arena 
             self._x = min(max(self._x, 5), aw - self._w)
             self._y = max(self._y, 5) # Clamp
+
 
 
             #           ANIMATION ZONE 
@@ -323,9 +340,10 @@ class Arthur(Actor):
                     self._sprite_start, self._sprite_end = JUMP_LEFT_NAKED[self._i_jump]
                 else:
                     self._sprite_start, self._sprite_end = JUMP_RIGHT_NAKED[self._i_jump]
+                    
             #________________IDLE FRAME LOGIC________________
             elif self._dx == 0:
-                self._frame = 0
+                # self._frame = 0
                 if self._direction == 1 and self._health == 2:
                     self._sprite_start, self._sprite_end = IDLE_LEFT_ARMOR
                 elif self._direction == 0 and self._health == 2:
@@ -347,7 +365,12 @@ class Arthur(Actor):
 
                 index = (self._frame//self._duration_frame)%(len(animation))
                 self._sprite_start, self._sprite_end = animation[index]
-            
+
+
+            if (not self.check_grace()) and self._frame%6 == 0:
+                    #casual coordinate of the png where there's nothing
+                    self._sprite_start, self._sprite_end = (-38, 42), (-16, 74)
+
             if self._frame >= 120:
                 self._frame = 0
             else:
@@ -365,6 +388,7 @@ class Arthur(Actor):
 
     def hit(self, arena: Arena):
         #uncomment the line below to activate the immortality for testing
+        self._grace = 0
         self._health -= 1
         if self._health <= 0:
             arena.kill(self)
@@ -372,6 +396,12 @@ class Arthur(Actor):
     
     def lives(self):
         return self._health
+
+    def check_grace(self):
+        return self._grace == self._grace_max
+    
+    def reset_grace(self):
+        self._grace = 0
 
     def pos(self) -> Point:
         return self._x, self._y

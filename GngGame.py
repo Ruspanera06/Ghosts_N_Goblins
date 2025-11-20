@@ -9,6 +9,7 @@ from model.Flame import Flame
 from model.Torch import Torch
 from model.Ladder import Ladder
 from model.Plant import Plant
+import g2d
 import json
 import actor
 
@@ -28,6 +29,7 @@ class GngGame(actor.Arena):
         for x in data["plants"]:
             self.spawn(Plant(tuple(x)))
         
+
         self._time = time
         self._score = 0
     
