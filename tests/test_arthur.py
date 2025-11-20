@@ -49,6 +49,29 @@ class TestArthur(unittest.TestCase):
 
         self.assertTrue(arthur.pos()[1]+ arthur.size()[1] == platform.pos()[1])
 
+    def test_grace(self):
+        arthur = Arthur((100, 315))
+
+        arena = Mock()
+        arena.size.return_value = (480, 500)
+        arena.current_keys.return_value = []
+        arena.collisions.return_value = []
+
+        arthur.hit(arena)
+        self.assertEqual(arthur._grace, 0)
+        initial_health = arthur._health
+
+        for _ in range(arthur._grace_max - 1):
+            arthur.move(arena)
+            arthur.hit(arena)  
+            self.assertEqual(arthur._health, initial_health)
+        
+        arthur.move(arena)
+        self.assertEqual(arthur._grace, arthur._grace_max)
+        arthur.hit(arena)
+        self.assertEqual(arthur._health, initial_health - 1)
+    
+
 
 
 if __name__ == "__main__":

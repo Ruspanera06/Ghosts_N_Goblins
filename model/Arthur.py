@@ -387,10 +387,11 @@ class Arthur(Actor):
 
     def hit(self, arena: Arena):
         #comment the 2 line below to activate the immortality for testing
-        self._grace = 0
-        self._health -= 1
-        if self._health <= 0:
-            arena.kill(self)
+        if self._grace == self._grace_max:
+            self._grace = 0
+            self._health -= 1
+            if self._health <= 0:
+                arena.kill(self)
             
     
     def lives(self):
