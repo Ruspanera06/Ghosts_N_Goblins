@@ -30,7 +30,7 @@ class GngGui():
         for a in self._game.actors():
             if a.sprite() != None:
                 x, y = a.pos()
-                g2d.draw_image("./assets/sprites/ghosts-goblins.png", (x - self._x_view, y - self._y_view), a.sprite(), a.size())
+                g2d.draw_image("./assets/sprites/ghosts-goblins-babbinatale.png", (x - self._x_view, y - self._y_view), a.sprite(), a.size())
             else:
                 pass
         
@@ -48,17 +48,17 @@ class GngGui():
 
         lives, time = self._game.lives(), self._game.time() // 30
         # g2d.draw_text(f"Lives: {lives} Time: {time}", (250, 12), 24)
-        g2d.draw_image("./assets/sprites/ghosts-goblins.png", (20, 3), self._player1_text[0], self._player1_text[1])
+        g2d.draw_image("./assets/sprites/ghosts-goblins-babbinatale.png", (20, 3), self._player1_text[0], self._player1_text[1])
         for i,x in enumerate(self.score_to_font_img(self._game.score())):
-            g2d.draw_image("./assets/sprites/ghosts-goblins.png", (20+i*8, 12), x[0], x[1])
+            g2d.draw_image("./assets/sprites/ghosts-goblins-babbinatale.png", (20+i*8, 12), x[0], x[1])
         
-        g2d.draw_image("./assets/sprites/ghosts-goblins.png", (100, 3), self._top_score_text[0], self._top_score_text[1])
+        g2d.draw_image("./assets/sprites/ghosts-goblins-babbinatale.png", (100, 3), self._top_score_text[0], self._top_score_text[1])
         for i,x in enumerate(self.score_to_font_img(self._top_score)):
-            g2d.draw_image("./assets/sprites/ghosts-goblins.png", (100+i*8, 12), x[0], x[1])
+            g2d.draw_image("./assets/sprites/ghosts-goblins-babbinatale.png", (100+i*8, 12), x[0], x[1])
 
-        g2d.draw_image("./assets/sprites/ghosts-goblins.png", (20, 25), self._time_text[0], self._time_text[1])
+        g2d.draw_image("./assets/sprites/ghosts-goblins-babbinatale.png", (20, 25), self._time_text[0], self._time_text[1])
         for i,x in enumerate(self.number_to_font_img(time)):
-            g2d.draw_image("./assets/sprites/ghosts-goblins.png", (20+i*8, 34), x[0], x[1])
+            g2d.draw_image("./assets/sprites/ghosts-goblins-babbinatale.png", (20+i*8, 34), x[0], x[1])
         
         
 
