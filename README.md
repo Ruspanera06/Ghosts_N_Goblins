@@ -1,5 +1,8 @@
 # 👻 Ghosts 'N Goblins – University Project
 
+# 🥚EASTER EGG
+typing "snow" while playing will put the Christman theme to the game for 20 seconds
+
 ## 🎮 Description  
 This project is a recreation of **Ghosts 'N Goblins**, developed as part of a university programming assignment.  
 The game was **selected by my professor at the University of Parma (Università di Parma)** as the required project for the course.  
