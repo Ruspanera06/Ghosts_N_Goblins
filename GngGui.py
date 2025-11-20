@@ -3,7 +3,7 @@ from GngGame import GngGame
 import json
 from model.SnowFlake import SnowFlake
 from model.Zombie import Zombie
-from random import randint
+from random import randint, choice
 class GngGui():
     def __init__(self, viewport_size=(400-2, 239-10)):
         self._x_view,self._y_view = 2,10
@@ -18,7 +18,7 @@ class GngGui():
         self._prev_keys = set()
         self._key_buffer = ""
         self._snow = False
-        self._max_snow_duration = 6*60
+        self._max_snow_duration = 20*60
         self._snow_duration = self._max_snow_duration
         self._game = GngGame()
 
@@ -67,11 +67,9 @@ class GngGui():
                 x, y = a.pos()
                 image = "./assets/sprites/ghosts-goblins.png"
                 if isinstance(a, SnowFlake):
-                    image = "./assets/sprites/snowflakes.png"
-                    # g2d.draw_image(image, (x - self._x_view, y - self._y_view), a.sprite(), a.size())
-                elif isinstance(a, Zombie) and self._snow:
+                    image = "./assets/sprites/pixel_snowflakes.png"
+                elif self._snow:
                     image = "./assets/sprites/ghosts-goblins-babbinatale.png"
-                    # g2d.draw_image("./assets/sprites/ghosts-goblins-babbinatale.png", (x - self._x_view, y - self._y_view), a.sprite(), a.size())
 
                 g2d.draw_image(image, (x - self._x_view, y - self._y_view), a.sprite(), a.size())
             else:
@@ -117,12 +115,12 @@ class GngGui():
             self._game.tick(g2d.current_keys())
     
     def snowing(self):
-        s = randint(0, 20)
+        s = randint(0, 3)
         if s == 0:
             n = randint(0, 25)
             for i in range(n):
-                x = randint(self._x_view, self._x_view+self._w_view)
-                y = -20
+                x = randint(self._x_view, self._x_view+self._w_view) 
+                y = randint(-20, -5)
                 self._game.spawn(SnowFlake((x, y)))
     
     def save_top_score(self):
