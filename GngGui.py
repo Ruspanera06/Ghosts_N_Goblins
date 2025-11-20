@@ -57,6 +57,8 @@ class GngGui():
         self._snow_duration = min(self._snow_duration+1, self._max_snow_duration)
         if self._snow and not(self._snow_duration == self._max_snow_duration):
             self.snowing()
+        else:
+            self._snow = False
         
 
         g2d.draw_image("./assets/sprites/ghosts-goblins-bg.png", (-self._initial_image_x,-self._initial_image_y),(self._x_view, self._y_view),(self._w_view,self._h_view) )
@@ -67,7 +69,7 @@ class GngGui():
                 if isinstance(a, SnowFlake):
                     image = "./assets/sprites/snowflakes.png"
                     # g2d.draw_image(image, (x - self._x_view, y - self._y_view), a.sprite(), a.size())
-                elif isinstance(a, Zombie):
+                elif isinstance(a, Zombie) and self._snow:
                     image = "./assets/sprites/ghosts-goblins-babbinatale.png"
                     # g2d.draw_image("./assets/sprites/ghosts-goblins-babbinatale.png", (x - self._x_view, y - self._y_view), a.sprite(), a.size())
 

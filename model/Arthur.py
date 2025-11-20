@@ -194,26 +194,27 @@ class Arthur(Actor):
                 if isinstance(other, (Platform,Gravestone)):
                     plat_x, plat_y = other.pos()
                     plat_w, plat_h = other.size()
-
-                    # 1. down ⤓ 
-                    if self._y < plat_y and self._dy >= 0  and self._ladder == None:
-                        self._y = plat_y - self._h  
+                    if self._y + self._h > plat_y and self._dy and not(plat_y<=self._y <= plat_y+plat_h) > 0 and self._ladder == None:
+                        # print(other.pos(), self._y+self._h)
+                        print(plat_y + plat_h, self._y)
+                        self._y = plat_y - self._h
                         self._dy = 0
                         self._is_grounded = True
-                        self._jump_anim = False
+                        self._jump_anim = False 
                     
                     # 2. up ⤒ 
-                    elif self._y > plat_y + plat_h and self._dy <= 0 and self._ladder == None:
+                    elif (plat_y<=self._y <= plat_y+plat_h) and self._dy < 0 and self._ladder == None:
+                        print(plat_y + plat_h, self._y)
                         self._y = plat_y + plat_h + 1
                         self._dy = 0
                     
                     # 3. left ⇥ 
-                    elif self._x < plat_x and self._dx >= 0 and self._ladder == None:
+                    elif self._x < plat_x and self._dx > 0:
                         self._x = plat_x - self._w
                         self._dx = 0 # Block movement
                     
                     # 4.right ⇤ 
-                    elif self._x + self._dx < plat_x + plat_w and self._dx <= 0 and self._ladder == None:
+                    elif self._x + self._w > plat_x + plat_w and self._dx < 0:
                         self._x = plat_x + plat_w
                         self._dx = 0 # Block movement
 
@@ -222,7 +223,8 @@ class Arthur(Actor):
                     if isinstance(other, Ladder):
                         x, y = other.pos()
                         x_end, y_end = other.end()
-                        if (x <= self._x <= x_end) or (x <= self.end()[0] <= x_end):
+                        if (x <= self._x <= x_end) or (x <= self.end()[0] <= x_end) and self._is_grounded:
+                            self._y += 7
                             self._ladder = other
                             ladder_x_size = abs(x-x_end)/2
                             self._x = x + ladder_x_size - self.size()[0]/2 -4
@@ -233,7 +235,7 @@ class Arthur(Actor):
                     if isinstance(other, Ladder):
                         x, y = other.pos()
                         x_end, y_end = other.end()
-                        if (x <= self._x <= x_end) or (x <= self.end()[0] <= x_end):
+                        if (x <= self._x <= x_end) or (x <= self.end()[0] <= x_end) and other._y<=self._y <=other._y+other.size()[1] and self._is_grounded:
                             self._ladder = other
                             self._y -= 2
                             ladder_x_size = abs(x-x_end)/2
