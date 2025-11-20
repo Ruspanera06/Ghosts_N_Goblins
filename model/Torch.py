@@ -2,6 +2,7 @@ from actor import Actor, Arena, Point
 from random import choice, randint
 from model.Flame import Flame
 from model.Zombie import Zombie
+from model.Plant import Plant
 
 #___________        ANIMATIONS          ____________
 THROW_RIGHT = [
@@ -49,7 +50,7 @@ class Torch(Actor):
 
         #________________       Collision Detection     ________________
         for other in arena.collisions():
-                if isinstance(other, Zombie):
+                if isinstance(other, (Zombie, Plant)):
                     x, y = other.pos()
                     w, h = other.size()
                     

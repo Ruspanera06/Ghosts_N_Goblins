@@ -134,7 +134,7 @@ class Arthur(Actor):
         self._attack_frame = self._attack_speed
         self._ladder_speed = 2
 
-        self._grace_max = 3 * 60
+        self._grace_max = 3 * 30
         self._grace = self._grace_max
         
         #animation stats
@@ -386,9 +386,9 @@ class Arthur(Actor):
         arena.spawn(Torch((x, y), direction))
 
     def hit(self, arena: Arena):
-        #comment the line below to activate the immortality for testing
-        # self._grace = 0
-        # self._health -= 1
+        #comment the 2 line below to activate the immortality for testing
+        self._grace = 0
+        self._health -= 1
         if self._health <= 0:
             arena.kill(self)
             
