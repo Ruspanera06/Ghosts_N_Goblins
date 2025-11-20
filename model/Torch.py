@@ -26,7 +26,7 @@ class Torch(Actor):
         self._spawn = True 
         self._speed = 3
         self._dx = dx*self._speed
-        self._dy = 0
+        self._dy = -4
         self._direction = dx
         #animation stats
         self._sprite_start, self._sprite_end = THROW_LEFT[0] if self._direction == 1 else THROW_RIGHT[0]
@@ -44,7 +44,8 @@ class Torch(Actor):
             arena.spawn(Flame(self.pos()))
         self._dx
         self._x += self._dx
-        self._y += G
+        self._dy += G
+        self._y += self._dy
         self._x = min(max(self._x, 5), aw - self._w)  # clamp
         self._y = min(max(self._y, 5), ah - self._h)  # clamp
 

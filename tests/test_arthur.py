@@ -1,10 +1,9 @@
 import unittest
+from unittest.mock import Mock
 from model.Arthur import Arthur
 from model.Zombie import Zombie
-from model.Platform import Platform
-from actor import Arena
 
-class TestTorch(unittest.TestCase):
+class TestArthur(unittest.TestCase):
     # python -m unittest tests/test_arthur.py
 
     def collide(self, art: Arthur, z: Zombie):
@@ -16,22 +15,39 @@ class TestTorch(unittest.TestCase):
         return False
     
     def test_collision_zombie(self):
-        art = Arthur((100, 150))
-        z1 = Zombie((100, 150), 1)
-        z2 = Zombie((100 - z1.size()[0], 150), 1)
-        z3 = Zombie((100 + z1.size()[0], 150), -1)
-        self.assertTrue(self.collide(art, z1))
-        self.assertTrue(self.collide(art, z2))
-        self.assertTrue(self.collide(art, z3))
+        arthur = Arthur((100, 150))
+        z1 = Mock()
+        z1.pos.return_value = (100, 150)
+        z1.size.return_value = (50, 50)
+
+        z2 = Mock()
+        z2.pos.return_value = (100 - 50, 150)
+        z2.size.return_value = (50, 50)
+
+        z3 = Mock()
+        z3.pos.return_value = (100 + 50, 150)
+        z3.size.return_value = (50, 50)
+
+        self.assertTrue(self.collide(arthur, z1))
+        self.assertTrue(self.collide(arthur, z2))
+        self.assertTrue(not self.collide(arthur, z3))
     
     def test_collision_platform(self):
-        a = Arena((3585, 239))
-        art = Arthur((100, 30))
-        p = Platform((80, art.pos()[1]+art.size()[1]+2), (120, art.pos()[1]+art.size()[1]+21))
-        a.spawn(art)
-        a.spawn(p)
-        art.move(a)
-        self.assertAlmostEqual(art.pos()[1]+art.size()[1],  p.pos()[1])
+        arthur = Arthur((100, 315))
+
+        arena = Mock()
+        arena.size.return_value = (480, 500)
+        arena.current_keys.return_value = []
+
+        platform = Mock()
+        platform.pos.return_value = (80, 317+arthur.size()[1])
+        platform.size.return_value = (80, 20)
+
+        arena.collisions.return_value = [platform]
+
+        arthur.move(arena)
+
+        self.assertTrue(arthur.pos()[1]+ arthur.size()[1] == platform.pos()[1])
 
 
 
