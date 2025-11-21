@@ -1,5 +1,6 @@
 # 👻 Ghosts 'N Goblins – University Project
 
+# [**Project Link**](https://github.com/Ruspanera06/Ghosts_N_Goblins)
 # 🥚EASTER EGG
 typing "snow" while playing will put the Christman theme to the game for 20 seconds
 
