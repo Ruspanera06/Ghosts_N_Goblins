@@ -61,7 +61,10 @@ class GngGui():
             self._snow = False
         
 
-        g2d.draw_image("./assets/sprites/ghosts-goblins-bg.png", (-self._initial_image_x,-self._initial_image_y),(self._x_view, self._y_view),(self._w_view,self._h_view) )
+        background = "./assets/sprites/ghosts-goblins-bg.png"
+        if self._snow:
+            background = "./assets/sprites/ghosts-goblins23-bg.png"
+        g2d.draw_image(background, (-self._initial_image_x,-self._initial_image_y),(self._x_view, self._y_view),(self._w_view,self._h_view) )
         for a in self._game.actors():
             if a.sprite() != None:
                 x, y = a.pos()
